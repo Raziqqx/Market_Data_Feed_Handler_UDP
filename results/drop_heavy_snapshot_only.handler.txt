@@ -1,0 +1,73 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+[feed] GAP: expected seq 1, got 60000001 (60000000 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1738962 msgs (66.11 MB), resume at seq 60006401, 649.35 ms; replaying 301392 buffered packets
+[feed] GAP: expected seq 60009364, got 60009368 (4 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739619 msgs (66.13 MB), resume at seq 60325357, 430.05 ms; replaying 496144 buffered packets
+[feed] GAP: expected seq 60328655, got 60328656 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739808 msgs (66.14 MB), resume at seq 60541625, 417.81 ms; replaying 395861 buffered packets
+[feed] GAP: expected seq 60543239, got 60543240 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739605 msgs (66.13 MB), resume at seq 60752009, 424.76 ms; replaying 392762 buffered packets
+[feed] GAP: expected seq 60757176, got 60757177 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739363 msgs (66.12 MB), resume at seq 60965280, 417.42 ms; replaying 387108 buffered packets
+[feed] GAP: expected seq 60965842, got 60965843 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739389 msgs (66.12 MB), resume at seq 61174773, 417.45 ms; replaying 387540 buffered packets
+[feed] GAP: expected seq 61174896, got 61174897 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739796 msgs (66.14 MB), resume at seq 61384327, 432.25 ms; replaying 397661 buffered packets
+[feed] GAP: expected seq 61384396, got 61384397 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739450 msgs (66.13 MB), resume at seq 61601633, 414.69 ms; replaying 396850 buffered packets
+[feed] GAP: expected seq 61602911, got 61602912 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1738888 msgs (66.10 MB), resume at seq 61809791, 420.90 ms; replaying 389483 buffered packets
+[feed] GAP: expected seq 61810583, got 61810584 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1738911 msgs (66.11 MB), resume at seq 62021060, 455.70 ms; replaying 409042 buffered packets
+[feed] GAP: expected seq 62022683, got 62022684 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739292 msgs (66.12 MB), resume at seq 62250235, 412.59 ms; replaying 403502 buffered packets
+[feed] GAP: expected seq 62250832, got 62250833 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1739887 msgs (66.14 MB), resume at seq 62457381, 425.06 ms; replaying 391713 buffered packets
+[feed] GAP: expected seq 62458122, got 62458123 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1740357 msgs (66.16 MB), resume at seq 62670732, 416.80 ms; replaying 394512 buffered packets
+[feed] GAP: expected seq 62676848, got 62676849 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1740000 msgs (66.15 MB), resume at seq 62880104, 427.30 ms; replaying 301737 buffered packets
+[feed] GAP: expected seq 62880448, got 62880449 (1 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1740541 msgs (66.17 MB), resume at seq 63000001, 463.36 ms; replaying 111747 buffered packets
+==================== feed handler report ====================
+packets 2796146  bytes 146637111  messages 25287  pushed to book 25178  (16.42 s)
+heartbeats 0  duplicate/old packets 2773198  bad packets 0  bad messages 0
+loss: simulated drops 0  kernel socket drops 6597  ring-full events 0  queue-full waits 4974673
+gaps 15  (messages missed on the wire 60000017)  -> retransmissions 0 (0 msgs)  snapshots 15 (26093868 msgs, book resets 15)
+recovery buffer: peak 45.0 MB, packets lost to its cap 0
+  #1    snapshot   expected 1          saw 60000001   resume@60006401    1738962 msgs   66.11 MB  first byte  377.84 ms  done  649.35 ms  buffered pkts 301392  tries 1
+  #2    snapshot   expected 60009364   saw 60009368   resume@60325357    1739619 msgs   66.13 MB  first byte  142.64 ms  done  430.05 ms  buffered pkts 496144  tries 1
+  #3    snapshot   expected 60328655   saw 60328656   resume@60541625    1739808 msgs   66.14 MB  first byte  138.66 ms  done  417.81 ms  buffered pkts 395861  tries 1
+  #4    snapshot   expected 60543239   saw 60543240   resume@60752009    1739605 msgs   66.13 MB  first byte  140.79 ms  done  424.76 ms  buffered pkts 392762  tries 1
+  #5    snapshot   expected 60757176   saw 60757177   resume@60965280    1739363 msgs   66.12 MB  first byte  139.52 ms  done  417.42 ms  buffered pkts 387108  tries 1
+  #6    snapshot   expected 60965842   saw 60965843   resume@61174773    1739389 msgs   66.12 MB  first byte  138.37 ms  done  417.45 ms  buffered pkts 387540  tries 1
+  #7    snapshot   expected 61174896   saw 61174897   resume@61384327    1739796 msgs   66.14 MB  first byte  135.68 ms  done  432.25 ms  buffered pkts 397661  tries 1
+  #8    snapshot   expected 61384396   saw 61384397   resume@61601633    1739450 msgs   66.13 MB  first byte  135.98 ms  done  414.69 ms  buffered pkts 396850  tries 1
+  #9    snapshot   expected 61602911   saw 61602912   resume@61809791    1738888 msgs   66.10 MB  first byte  135.77 ms  done  420.90 ms  buffered pkts 389483  tries 1
+  #10   snapshot   expected 61810583   saw 61810584   resume@62021060    1738911 msgs   66.11 MB  first byte  165.90 ms  done  455.70 ms  buffered pkts 409042  tries 1
+  #11   snapshot   expected 62022683   saw 62022684   resume@62250235    1739292 msgs   66.12 MB  first byte  138.06 ms  done  412.59 ms  buffered pkts 403502  tries 1
+  #12   snapshot   expected 62250832   saw 62250833   resume@62457381    1739887 msgs   66.14 MB  first byte  140.63 ms  done  425.06 ms  buffered pkts 391713  tries 1
+  #13   snapshot   expected 62458122   saw 62458123   resume@62670732    1740357 msgs   66.16 MB  first byte  136.72 ms  done  416.80 ms  buffered pkts 394512  tries 1
+  #14   snapshot   expected 62676848   saw 62676849   resume@62880104    1740000 msgs   66.15 MB  first byte  137.92 ms  done  427.30 ms  buffered pkts 301737  tries 1
+  #15   snapshot   expected 62880448   saw 62880449   resume@63000001    1740541 msgs   66.17 MB  first byte  159.15 ms  done  463.36 ms  buffered pkts 111747  tries 1
+book: adds 25971341 execs 423 execs w/price 6 cancels 279 deletes 11048 replaces 2209
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 25178 replayed)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)    (no samples)
+  2 user -> queued (parse)   (no samples)
+  3 queue hop (feed->book)   (no samples)
+  4 book apply               (no samples)
+    user -> book (2+3+4)     (no samples)
+  = WIRE -> BOOK (1..4)      (no samples)
+  book apply by message type:
+      add (A/F)              (no samples)
+      execute (E)            (no samples)
+      execute w/ price (C)   (no samples)
+      cancel (X)             (no samples)
+      delete (D)             (no samples)
+      replace (U)            (no samples)
+
+final books: 8906 instruments, 1731624 resting orders, digest ce4ff04802569dbd
+server books: digest ce4ff04802569dbd at seq<63000001 (1731624 orders)  ->  MATCH: books identical to the publisher's

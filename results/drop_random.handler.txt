@@ -1,0 +1,341 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+[feed] GAP: expected seq 19549, got 19550 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 19550, 0.47 ms; replaying 197 buffered packets
+[feed] GAP: expected seq 46091, got 46092 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 46092, 0.29 ms; replaying 139 buffered packets
+[feed] GAP: expected seq 47053, got 47054 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 47054, 0.29 ms; replaying 134 buffered packets
+[feed] GAP: expected seq 55420, got 55421 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 55421, 0.52 ms; replaying 213 buffered packets
+[feed] GAP: expected seq 78105, got 78106 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 78106, 0.24 ms; replaying 110 buffered packets
+[feed] GAP: expected seq 89663, got 89665 (2 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 2 msgs (0.00 MB), resume at seq 89665, 0.24 ms; replaying 78 buffered packets
+[feed] GAP: expected seq 165325, got 165326 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 165326, 0.28 ms; replaying 123 buffered packets
+[feed] GAP: expected seq 174006, got 174007 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 174007, 0.17 ms; replaying 85 buffered packets
+[feed] GAP: expected seq 181893, got 181894 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 181894, 0.22 ms; replaying 100 buffered packets
+[feed] GAP: expected seq 248360, got 248361 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 248361, 32.05 ms; replaying 11508 buffered packets
+[feed] GAP: expected seq 268662, got 268663 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 268663, 0.27 ms; replaying 101 buffered packets
+[feed] GAP: expected seq 314388, got 314389 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 314389, 0.28 ms; replaying 126 buffered packets
+[feed] GAP: expected seq 330095, got 330096 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 330096, 0.25 ms; replaying 118 buffered packets
+[feed] GAP: expected seq 357703, got 357704 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 357704, 0.32 ms; replaying 147 buffered packets
+[feed] GAP: expected seq 410511, got 410512 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 410512, 0.20 ms; replaying 80 buffered packets
+[feed] GAP: expected seq 457147, got 457148 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 457148, 0.37 ms; replaying 146 buffered packets
+[feed] GAP: expected seq 467279, got 467280 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 467280, 0.24 ms; replaying 115 buffered packets
+[feed] GAP: expected seq 528833, got 528834 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 528834, 0.24 ms; replaying 108 buffered packets
+[feed] GAP: expected seq 543040, got 543041 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 543041, 0.30 ms; replaying 139 buffered packets
+[feed] GAP: expected seq 595917, got 595918 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 595918, 0.39 ms; replaying 177 buffered packets
+[feed] GAP: expected seq 643573, got 643574 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 643574, 0.25 ms; replaying 113 buffered packets
+[feed] GAP: expected seq 653488, got 653489 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 653489, 0.17 ms; replaying 79 buffered packets
+[feed] GAP: expected seq 656543, got 656544 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 656544, 0.34 ms; replaying 160 buffered packets
+[feed] GAP: expected seq 676459, got 676460 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 676460, 0.21 ms; replaying 80 buffered packets
+[feed] GAP: expected seq 722751, got 722752 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 722752, 0.24 ms; replaying 108 buffered packets
+[feed] GAP: expected seq 728355, got 728356 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 728356, 0.20 ms; replaying 89 buffered packets
+[feed] GAP: expected seq 755338, got 755339 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 755339, 0.33 ms; replaying 159 buffered packets
+[feed] GAP: expected seq 771501, got 771502 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 771502, 0.20 ms; replaying 97 buffered packets
+[feed] GAP: expected seq 776739, got 776740 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 776740, 0.20 ms; replaying 95 buffered packets
+[feed] GAP: expected seq 801022, got 801023 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 801023, 0.34 ms; replaying 153 buffered packets
+[feed] GAP: expected seq 831356, got 831358 (2 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 2 msgs (0.00 MB), resume at seq 831358, 0.21 ms; replaying 100 buffered packets
+[feed] GAP: expected seq 892313, got 892314 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 892314, 0.33 ms; replaying 151 buffered packets
+[feed] GAP: expected seq 897527, got 897528 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 897528, 0.30 ms; replaying 140 buffered packets
+[feed] GAP: expected seq 978989, got 978990 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 978990, 0.34 ms; replaying 160 buffered packets
+[feed] GAP: expected seq 1001117, got 1001118 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1001118, 0.25 ms; replaying 119 buffered packets
+[feed] GAP: expected seq 1023911, got 1023912 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1023912, 0.35 ms; replaying 163 buffered packets
+[feed] GAP: expected seq 1028970, got 1028971 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1028971, 0.22 ms; replaying 95 buffered packets
+[feed] GAP: expected seq 1029442, got 1029443 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1029443, 0.27 ms; replaying 130 buffered packets
+[feed] GAP: expected seq 1046014, got 1046015 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1046015, 0.31 ms; replaying 143 buffered packets
+[feed] GAP: expected seq 1051576, got 1051577 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1051577, 0.22 ms; replaying 102 buffered packets
+[feed] GAP: expected seq 1053878, got 1053879 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1053879, 0.25 ms; replaying 112 buffered packets
+[feed] GAP: expected seq 1060956, got 1060957 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1060957, 0.25 ms; replaying 118 buffered packets
+[feed] GAP: expected seq 1079447, got 1079448 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1079448, 0.28 ms; replaying 134 buffered packets
+[feed] GAP: expected seq 1095170, got 1095171 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1095171, 0.20 ms; replaying 94 buffered packets
+[feed] GAP: expected seq 1185333, got 1185334 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1185334, 0.26 ms; replaying 123 buffered packets
+[feed] GAP: expected seq 1254721, got 1254722 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1254722, 0.42 ms; replaying 162 buffered packets
+[feed] GAP: expected seq 1286229, got 1286230 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1286230, 0.17 ms; replaying 79 buffered packets
+[feed] GAP: expected seq 1306355, got 1306356 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1306356, 0.26 ms; replaying 123 buffered packets
+[feed] GAP: expected seq 1326127, got 1326128 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1326128, 0.34 ms; replaying 163 buffered packets
+[feed] GAP: expected seq 1351314, got 1351315 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1351315, 0.25 ms; replaying 121 buffered packets
+[feed] GAP: expected seq 1363711, got 1363712 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1363712, 0.42 ms; replaying 200 buffered packets
+[feed] GAP: expected seq 1376608, got 1376609 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1376609, 0.21 ms; replaying 92 buffered packets
+[feed] GAP: expected seq 1385186, got 1385187 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1385187, 0.19 ms; replaying 61 buffered packets
+[feed] GAP: expected seq 1410716, got 1410717 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1410717, 0.21 ms; replaying 12 buffered packets
+[feed] GAP: expected seq 1422299, got 1422300 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1422300, 0.38 ms; replaying 184 buffered packets
+[feed] GAP: expected seq 1438285, got 1438286 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1438286, 0.26 ms; replaying 108 buffered packets
+[feed] GAP: expected seq 1470860, got 1470861 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1470861, 0.23 ms; replaying 96 buffered packets
+[feed] GAP: expected seq 1475481, got 1475482 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1475482, 0.14 ms; replaying 66 buffered packets
+[feed] GAP: expected seq 1488092, got 1488093 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1488093, 0.28 ms; replaying 129 buffered packets
+[feed] GAP: expected seq 1503942, got 1503943 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1503943, 0.32 ms; replaying 144 buffered packets
+[feed] GAP: expected seq 1511175, got 1511176 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1511176, 0.27 ms; replaying 129 buffered packets
+[feed] GAP: expected seq 1518677, got 1518678 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1518678, 0.28 ms; replaying 117 buffered packets
+[feed] GAP: expected seq 1611674, got 1611676 (2 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 2 msgs (0.00 MB), resume at seq 1611676, 0.19 ms; replaying 89 buffered packets
+[feed] GAP: expected seq 1636122, got 1636123 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1636123, 0.24 ms; replaying 103 buffered packets
+[feed] GAP: expected seq 1638024, got 1638025 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1638025, 0.34 ms; replaying 161 buffered packets
+[feed] GAP: expected seq 1693775, got 1693776 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1693776, 0.32 ms; replaying 140 buffered packets
+[feed] GAP: expected seq 1721773, got 1721774 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1721774, 0.25 ms; replaying 122 buffered packets
+[feed] GAP: expected seq 1728017, got 1728018 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1728018, 0.18 ms; replaying 89 buffered packets
+[feed] GAP: expected seq 1729492, got 1729493 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1729493, 0.16 ms; replaying 76 buffered packets
+[feed] GAP: expected seq 1742352, got 1742353 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1742353, 0.20 ms; replaying 94 buffered packets
+[feed] GAP: expected seq 1803781, got 1803782 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1803782, 0.22 ms; replaying 102 buffered packets
+[feed] GAP: expected seq 1804768, got 1804769 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1804769, 0.13 ms; replaying 73 buffered packets
+[feed] GAP: expected seq 1822726, got 1822727 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1822727, 0.24 ms; replaying 92 buffered packets
+[feed] GAP: expected seq 1827342, got 1827343 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1827343, 0.25 ms; replaying 121 buffered packets
+[feed] GAP: expected seq 1864031, got 1864032 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1864032, 0.28 ms; replaying 133 buffered packets
+[feed] GAP: expected seq 1868046, got 1868047 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1868047, 0.22 ms; replaying 99 buffered packets
+[feed] GAP: expected seq 1871735, got 1871736 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1871736, 0.20 ms; replaying 95 buffered packets
+[feed] GAP: expected seq 1900258, got 1900259 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1900259, 0.26 ms; replaying 120 buffered packets
+[feed] GAP: expected seq 1927949, got 1927950 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1927950, 0.20 ms; replaying 94 buffered packets
+[feed] GAP: expected seq 1928265, got 1928266 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1928266, 0.08 ms; replaying 34 buffered packets
+[feed] GAP: expected seq 1985563, got 1985564 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 1985564, 0.25 ms; replaying 119 buffered packets
+[feed] GAP: expected seq 2044549, got 2044550 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2044550, 0.23 ms; replaying 108 buffered packets
+[feed] GAP: expected seq 2074698, got 2074699 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2074699, 0.23 ms; replaying 32 buffered packets
+[feed] GAP: expected seq 2107264, got 2107265 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2107265, 0.31 ms; replaying 146 buffered packets
+[feed] GAP: expected seq 2113096, got 2113097 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2113097, 0.19 ms; replaying 93 buffered packets
+[feed] GAP: expected seq 2123000, got 2123001 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2123001, 0.10 ms; replaying 47 buffered packets
+[feed] GAP: expected seq 2128611, got 2128612 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2128612, 0.11 ms; replaying 52 buffered packets
+[feed] GAP: expected seq 2159444, got 2159445 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2159445, 0.17 ms; replaying 81 buffered packets
+[feed] GAP: expected seq 2160271, got 2160272 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2160272, 0.23 ms; replaying 109 buffered packets
+[feed] GAP: expected seq 2173776, got 2173777 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2173777, 0.16 ms; replaying 75 buffered packets
+[feed] GAP: expected seq 2174388, got 2174389 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2174389, 0.16 ms; replaying 72 buffered packets
+[feed] GAP: expected seq 2176759, got 2176760 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2176760, 0.22 ms; replaying 107 buffered packets
+[feed] GAP: expected seq 2181617, got 2181618 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2181618, 0.18 ms; replaying 88 buffered packets
+[feed] GAP: expected seq 2203982, got 2203983 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2203983, 0.24 ms; replaying 114 buffered packets
+[feed] GAP: expected seq 2217050, got 2217051 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2217051, 0.49 ms; replaying 239 buffered packets
+[feed] GAP: expected seq 2228532, got 2228533 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2228533, 0.26 ms; replaying 124 buffered packets
+[feed] GAP: expected seq 2268277, got 2268278 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2268278, 0.32 ms; replaying 154 buffered packets
+[feed] GAP: expected seq 2298441, got 2298442 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2298442, 0.24 ms; replaying 112 buffered packets
+[feed] GAP: expected seq 2322662, got 2322663 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2322663, 0.26 ms; replaying 114 buffered packets
+[feed] GAP: expected seq 2329081, got 2329082 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2329082, 0.28 ms; replaying 117 buffered packets
+[feed] GAP: expected seq 2338099, got 2338100 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2338100, 0.15 ms; replaying 71 buffered packets
+[feed] GAP: expected seq 2377945, got 2377946 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2377946, 0.29 ms; replaying 137 buffered packets
+[feed] GAP: expected seq 2388887, got 2388888 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2388888, 0.24 ms; replaying 110 buffered packets
+[feed] GAP: expected seq 2396036, got 2396037 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2396037, 0.27 ms; replaying 128 buffered packets
+[feed] GAP: expected seq 2422635, got 2422636 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2422636, 0.33 ms; replaying 93 buffered packets
+[feed] GAP: expected seq 2435138, got 2435139 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2435139, 0.90 ms; replaying 377 buffered packets
+[feed] GAP: expected seq 2438985, got 2438986 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2438986, 0.23 ms; replaying 113 buffered packets
+[feed] GAP: expected seq 2491593, got 2491594 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2491594, 0.18 ms; replaying 73 buffered packets
+[feed] GAP: expected seq 2503728, got 2503729 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2503729, 0.15 ms; replaying 67 buffered packets
+[feed] GAP: expected seq 2527610, got 2527611 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2527611, 7.51 ms; replaying 2481 buffered packets
+[feed] GAP: expected seq 2544161, got 2544162 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2544162, 0.30 ms; replaying 119 buffered packets
+[feed] GAP: expected seq 2551629, got 2551630 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2551630, 0.28 ms; replaying 131 buffered packets
+[feed] GAP: expected seq 2563889, got 2563890 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2563890, 0.14 ms; replaying 62 buffered packets
+[feed] GAP: expected seq 2607973, got 2607974 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2607974, 0.21 ms; replaying 99 buffered packets
+[feed] GAP: expected seq 2620752, got 2620753 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2620753, 0.13 ms; replaying 61 buffered packets
+[feed] GAP: expected seq 2629443, got 2629444 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2629444, 0.20 ms; replaying 95 buffered packets
+[feed] GAP: expected seq 2645613, got 2645614 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2645614, 0.20 ms; replaying 88 buffered packets
+[feed] GAP: expected seq 2649410, got 2649411 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2649411, 0.20 ms; replaying 91 buffered packets
+[feed] GAP: expected seq 2660409, got 2660410 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2660410, 0.19 ms; replaying 93 buffered packets
+[feed] GAP: expected seq 2754944, got 2754945 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2754945, 0.23 ms; replaying 110 buffered packets
+[feed] GAP: expected seq 2758647, got 2758648 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2758648, 0.25 ms; replaying 78 buffered packets
+[feed] GAP: expected seq 2780993, got 2780994 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2780994, 0.18 ms; replaying 80 buffered packets
+[feed] GAP: expected seq 2808433, got 2808434 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2808434, 0.40 ms; replaying 153 buffered packets
+[feed] GAP: expected seq 2809507, got 2809508 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2809508, 0.16 ms; replaying 70 buffered packets
+[feed] GAP: expected seq 2841894, got 2841895 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2841895, 0.21 ms; replaying 93 buffered packets
+[feed] GAP: expected seq 2861658, got 2861659 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2861659, 0.31 ms; replaying 149 buffered packets
+[feed] GAP: expected seq 2863940, got 2863941 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2863941, 0.18 ms; replaying 82 buffered packets
+[feed] GAP: expected seq 2864063, got 2864064 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2864064, 0.06 ms; replaying 26 buffered packets
+[feed] GAP: expected seq 2869161, got 2869162 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2869162, 0.21 ms; replaying 98 buffered packets
+[feed] GAP: expected seq 2921559, got 2921560 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2921560, 0.24 ms; replaying 112 buffered packets
+[feed] GAP: expected seq 2937831, got 2937832 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2937832, 0.24 ms; replaying 106 buffered packets
+[feed] GAP: expected seq 2964702, got 2964703 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2964703, 0.21 ms; replaying 95 buffered packets
+[feed] GAP: expected seq 2965544, got 2965545 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2965545, 0.15 ms; replaying 73 buffered packets
+[feed] GAP: expected seq 2967076, got 2967077 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2967077, 0.11 ms; replaying 52 buffered packets
+[feed] GAP: expected seq 2972896, got 2972897 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2972897, 0.17 ms; replaying 83 buffered packets
+[feed] GAP: expected seq 2996675, got 2996676 (1 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 1 msgs (0.00 MB), resume at seq 2996676, 0.23 ms; replaying 55 buffered packets
+==================== feed handler report ====================
+packets 2765601  bytes 143077374  messages 3000000  pushed to book 2775008  (6.09 s)
+heartbeats 0  duplicate/old packets 0  bad packets 0  bad messages 0
+loss: simulated drops 136  kernel socket drops 0  ring-full events 0  queue-full waits 0
+gaps 136  (messages missed on the wire 139)  -> retransmissions 136 (139 msgs)  snapshots 0 (0 msgs, book resets 0)
+recovery buffer: peak 1.1 MB, packets lost to its cap 0
+  #1    retransmit expected 19549      saw 19550      resume@19550             1 msgs    0.00 MB  first byte    0.45 ms  done    0.47 ms  buffered pkts 197     tries 1
+  #2    retransmit expected 46091      saw 46092      resume@46092             1 msgs    0.00 MB  first byte    0.28 ms  done    0.29 ms  buffered pkts 139     tries 1
+  #3    retransmit expected 47053      saw 47054      resume@47054             1 msgs    0.00 MB  first byte    0.28 ms  done    0.29 ms  buffered pkts 134     tries 1
+  #4    retransmit expected 55420      saw 55421      resume@55421             1 msgs    0.00 MB  first byte    0.50 ms  done    0.52 ms  buffered pkts 213     tries 1
+  #5    retransmit expected 78105      saw 78106      resume@78106             1 msgs    0.00 MB  first byte    0.22 ms  done    0.24 ms  buffered pkts 110     tries 1
+  #6    retransmit expected 89663      saw 89665      resume@89665             2 msgs    0.00 MB  first byte    0.22 ms  done    0.24 ms  buffered pkts 78      tries 1
+  #7    retransmit expected 165325     saw 165326     resume@165326            1 msgs    0.00 MB  first byte    0.26 ms  done    0.28 ms  buffered pkts 123     tries 1
+  #8    retransmit expected 174006     saw 174007     resume@174007            1 msgs    0.00 MB  first byte    0.17 ms  done    0.17 ms  buffered pkts 85      tries 1
+  #9    retransmit expected 181893     saw 181894     resume@181894            1 msgs    0.00 MB  first byte    0.21 ms  done    0.22 ms  buffered pkts 100     tries 1
+  #10   retransmit expected 248360     saw 248361     resume@248361            1 msgs    0.00 MB  first byte   32.02 ms  done   32.05 ms  buffered pkts 11508   tries 1
+  #11   retransmit expected 268662     saw 268663     resume@268663            1 msgs    0.00 MB  first byte    0.26 ms  done    0.27 ms  buffered pkts 101     tries 1
+  #12   retransmit expected 314388     saw 314389     resume@314389            1 msgs    0.00 MB  first byte    0.27 ms  done    0.28 ms  buffered pkts 126     tries 1
+  #13   retransmit expected 330095     saw 330096     resume@330096            1 msgs    0.00 MB  first byte    0.24 ms  done    0.25 ms  buffered pkts 118     tries 1
+  #14   retransmit expected 357703     saw 357704     resume@357704            1 msgs    0.00 MB  first byte    0.30 ms  done    0.32 ms  buffered pkts 147     tries 1
+  #15   retransmit expected 410511     saw 410512     resume@410512            1 msgs    0.00 MB  first byte    0.19 ms  done    0.20 ms  buffered pkts 80      tries 1
+  #16   retransmit expected 457147     saw 457148     resume@457148            1 msgs    0.00 MB  first byte    0.34 ms  done    0.37 ms  buffered pkts 146     tries 1
+  #17   retransmit expected 467279     saw 467280     resume@467280            1 msgs    0.00 MB  first byte    0.23 ms  done    0.24 ms  buffered pkts 115     tries 1
+  #18   retransmit expected 528833     saw 528834     resume@528834            1 msgs    0.00 MB  first byte    0.23 ms  done    0.24 ms  buffered pkts 108     tries 1
+  #19   retransmit expected 543040     saw 543041     resume@543041            1 msgs    0.00 MB  first byte    0.28 ms  done    0.30 ms  buffered pkts 139     tries 1
+  #20   retransmit expected 595917     saw 595918     resume@595918            1 msgs    0.00 MB  first byte    0.36 ms  done    0.39 ms  buffered pkts 177     tries 1
+  #21   retransmit expected 643573     saw 643574     resume@643574            1 msgs    0.00 MB  first byte    0.24 ms  done    0.25 ms  buffered pkts 113     tries 1
+  #22   retransmit expected 653488     saw 653489     resume@653489            1 msgs    0.00 MB  first byte    0.16 ms  done    0.17 ms  buffered pkts 79      tries 1
+  #23   retransmit expected 656543     saw 656544     resume@656544            1 msgs    0.00 MB  first byte    0.33 ms  done    0.34 ms  buffered pkts 160     tries 1
+  #24   retransmit expected 676459     saw 676460     resume@676460            1 msgs    0.00 MB  first byte    0.20 ms  done    0.21 ms  buffered pkts 80      tries 1
+  #25   retransmit expected 722751     saw 722752     resume@722752            1 msgs    0.00 MB  first byte    0.22 ms  done    0.24 ms  buffered pkts 108     tries 1
+  #26   retransmit expected 728355     saw 728356     resume@728356            1 msgs    0.00 MB  first byte    0.19 ms  done    0.20 ms  buffered pkts 89      tries 1
+  #27   retransmit expected 755338     saw 755339     resume@755339            1 msgs    0.00 MB  first byte    0.32 ms  done    0.33 ms  buffered pkts 159     tries 1
+  #28   retransmit expected 771501     saw 771502     resume@771502            1 msgs    0.00 MB  first byte    0.19 ms  done    0.20 ms  buffered pkts 97      tries 1
+  #29   retransmit expected 776739     saw 776740     resume@776740            1 msgs    0.00 MB  first byte    0.19 ms  done    0.20 ms  buffered pkts 95      tries 1
+  #30   retransmit expected 801022     saw 801023     resume@801023            1 msgs    0.00 MB  first byte    0.33 ms  done    0.34 ms  buffered pkts 153     tries 1
+  #31   retransmit expected 831356     saw 831358     resume@831358            2 msgs    0.00 MB  first byte    0.20 ms  done    0.21 ms  buffered pkts 100     tries 1
+  #32   retransmit expected 892313     saw 892314     resume@892314            1 msgs    0.00 MB  first byte    0.32 ms  done    0.33 ms  buffered pkts 151     tries 1
+  #33   retransmit expected 897527     saw 897528     resume@897528            1 msgs    0.00 MB  first byte    0.29 ms  done    0.30 ms  buffered pkts 140     tries 1
+  #34   retransmit expected 978989     saw 978990     resume@978990            1 msgs    0.00 MB  first byte    0.32 ms  done    0.34 ms  buffered pkts 160     tries 1
+  #35   retransmit expected 1001117    saw 1001118    resume@1001118           1 msgs    0.00 MB  first byte    0.24 ms  done    0.25 ms  buffered pkts 119     tries 1
+  #36   retransmit expected 1023911    saw 1023912    resume@1023912           1 msgs    0.00 MB  first byte    0.34 ms  done    0.35 ms  buffered pkts 163     tries 1
+  #37   retransmit expected 1028970    saw 1028971    resume@1028971           1 msgs    0.00 MB  first byte    0.19 ms  done    0.22 ms  buffered pkts 95      tries 1
+  #38   retransmit expected 1029442    saw 1029443    resume@1029443           1 msgs    0.00 MB  first byte    0.26 ms  done    0.27 ms  buffered pkts 130     tries 1
+  #39   retransmit expected 1046014    saw 1046015    resume@1046015           1 msgs    0.00 MB  first byte    0.30 ms  done    0.31 ms  buffered pkts 143     tries 1
+  #40   retransmit expected 1051576    saw 1051577    resume@1051577           1 msgs    0.00 MB  first byte    0.21 ms  done    0.22 ms  buffered pkts 102     tries 1
+  ... 96 more
+book: adds 1116477 execs 5981 execs w/price 0 cancels 385792 deletes 1099806 replaces 149272
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 34480 replayed)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)         2722958     1552     1744    16000    149504    1569184      2444
+  2 user -> queued (parse)        2722958      146      230     2464     23808     211289       302
+  3 queue hop (feed->book)        2722958      150      324    23808    235520    1139735      1711
+  4 book apply                    2722958      105      190      500      1872    1035242       133
+    user -> book (2+3+4)          2722958      396      872    27392    235520    1310238      2147
+  = WIRE -> BOOK (1..4)           2722958     1936     2912    41472    315392    2232998      4591
+  book apply by message type:
+      add (A/F)                   1102664       99      174      552     12416     270693       137
+      execute (E)                    5862      142      428      952      3168      32457       226
+      execute w/ price (C)   (no samples)
+      cancel (X)                   379885       79      130      158       276      54891        80
+      delete (D)                  1086882      119      206      500      1040    1035242       137
+      replace (U)                  147665      158      284      680      2144      66456       200
+
+final books: 8906 instruments, 13831 resting orders, digest f58b799cfb687bf5
+server books: digest f58b799cfb687bf5 at seq<3000001 (13831 orders)  ->  MATCH: books identical to the publisher's

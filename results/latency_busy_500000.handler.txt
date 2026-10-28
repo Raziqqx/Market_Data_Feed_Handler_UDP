@@ -1,0 +1,35 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+[feed] GAP: expected seq 255497, got 260102 (4605 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 4605 msgs (0.14 MB), resume at seq 260102, 2.75 ms; replaying 1083 buffered packets
+[feed] GAP: expected seq 1261012, got 1261339 (327 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 327 msgs (0.01 MB), resume at seq 1261339, 1.21 ms; replaying 721 buffered packets
+==================== feed handler report ====================
+packets 4601777  bytes 241543116  messages 5000000  pushed to book 4765898  (10.14 s)
+heartbeats 0  duplicate/old packets 0  bad packets 0  bad messages 0
+loss: simulated drops 0  kernel socket drops 4246  ring-full events 0  queue-full waits 0
+gaps 2  (messages missed on the wire 4932)  -> retransmissions 2 (4932 msgs)  snapshots 0 (0 msgs, book resets 0)
+recovery buffer: peak 0.1 MB, packets lost to its cap 0
+  #1    retransmit expected 255497     saw 260102     resume@260102         4605 msgs    0.14 MB  first byte    2.56 ms  done    2.75 ms  buffered pkts 1083    tries 1
+  #2    retransmit expected 1261012    saw 1261339    resume@1261339         327 msgs    0.01 MB  first byte    1.19 ms  done    1.21 ms  buffered pkts 721     tries 1
+book: adds 2106674 execs 24571 execs w/price 0 cancels 503012 deletes 1861525 replaces 257236
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 7556 replayed)
+  (303 cross-core TSC readings went backwards and were clamped to 0)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)         4745462     1584     1872    13696    141312   11186023      4518
+  2 user -> queued (parse)        4745462      134      206     2336     24832    1208494       313
+  3 queue hop (feed->book)        4745462      146      404    26880    219136    1509666      1755
+  4 book apply                    4745462      109      214      712     11904    1131990       155
+    user -> book (2+3+4)          4745462      380     1000    30976    256000    1511208      2225
+  = WIRE -> BOOK (1..4)           4745462     2000     3296    42496    356352   11426009      6743
+  book apply by message type:
+      add (A/F)                   2103666      105      210      872     13440    1131990       175
+      execute (E)                   24551      146      452      952      2080      31661       225
+      execute w/ price (C)   (no samples)
+      cancel (X)                   501634       81      125      150       276      52587        79
+      delete (D)                  1858748      121      222      584      1104     113067       143
+      replace (U)                  256863      166      348      824     11392      57888       223
+
+final books: 8906 instruments, 231866 resting orders, digest 0bce285c8e8c1e18
+server books: digest 0bce285c8e8c1e18 at seq<5000001 (231866 orders)  ->  MATCH: books identical to the publisher's

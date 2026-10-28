@@ -1,0 +1,62 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+[feed] GAP: expected seq 285998, got 286001 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 12923 msgs (0.52 MB), resume at seq 286268, 6.98 ms; replaying 2952 buffered packets
+[feed] GAP: expected seq 560058, got 560061 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 14000 msgs (0.56 MB), resume at seq 560181, 8.82 ms; replaying 4214 buffered packets
+[feed] GAP: expected seq 829550, got 829553 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 14389 msgs (0.57 MB), resume at seq 829686, 4.06 ms; replaying 1998 buffered packets
+[feed] GAP: expected seq 1097503, got 1097506 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 14570 msgs (0.58 MB), resume at seq 1097596, 1.82 ms; replaying 875 buffered packets
+[feed] GAP: expected seq 1361644, got 1361647 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 14781 msgs (0.59 MB), resume at seq 1361797, 2.13 ms; replaying 1038 buffered packets
+[feed] GAP: expected seq 1626162, got 1626165 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 15071 msgs (0.60 MB), resume at seq 1626373, 2.33 ms; replaying 1099 buffered packets
+[feed] GAP: expected seq 1892454, got 1892457 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 15220 msgs (0.60 MB), resume at seq 1892635, 2.77 ms; replaying 1124 buffered packets
+[feed] GAP: expected seq 2155704, got 2155707 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 15832 msgs (0.63 MB), resume at seq 2155821, 2.87 ms; replaying 1392 buffered packets
+[feed] GAP: expected seq 2421918, got 2421921 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 16288 msgs (0.65 MB), resume at seq 2422037, 2.79 ms; replaying 1367 buffered packets
+[feed] GAP: expected seq 2691402, got 2691405 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 18923 msgs (0.75 MB), resume at seq 2691623, 4.71 ms; replaying 2111 buffered packets
+[feed] GAP: expected seq 2956045, got 2956048 (3 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 19727 msgs (0.78 MB), resume at seq 2956169, 3.10 ms; replaying 1515 buffered packets
+==================== feed handler report ====================
+packets 2788437  bytes 143533372  messages 2998252  pushed to book 2773389  (6.14 s)
+heartbeats 0  duplicate/old packets 1620  bad packets 0  bad messages 0
+loss: simulated drops 0  kernel socket drops 0  ring-full events 0  queue-full waits 0
+gaps 11  (messages missed on the wire 33)  -> retransmissions 0 (0 msgs)  snapshots 11 (171724 msgs, book resets 11)
+recovery buffer: peak 0.4 MB, packets lost to its cap 0
+  #1    snapshot   expected 285998     saw 286001     resume@286268        12923 msgs    0.52 MB  first byte    6.51 ms  done    6.98 ms  buffered pkts 2952    tries 1
+  #2    snapshot   expected 560058     saw 560061     resume@560181        14000 msgs    0.56 MB  first byte    8.37 ms  done    8.82 ms  buffered pkts 4214    tries 1
+  #3    snapshot   expected 829550     saw 829553     resume@829686        14389 msgs    0.57 MB  first byte    3.67 ms  done    4.06 ms  buffered pkts 1998    tries 1
+  #4    snapshot   expected 1097503    saw 1097506    resume@1097596       14570 msgs    0.58 MB  first byte    1.44 ms  done    1.82 ms  buffered pkts 875     tries 1
+  #5    snapshot   expected 1361644    saw 1361647    resume@1361797       14781 msgs    0.59 MB  first byte    1.82 ms  done    2.13 ms  buffered pkts 1038    tries 1
+  #6    snapshot   expected 1626162    saw 1626165    resume@1626373       15071 msgs    0.60 MB  first byte    2.00 ms  done    2.33 ms  buffered pkts 1099    tries 1
+  #7    snapshot   expected 1892454    saw 1892457    resume@1892635       15220 msgs    0.60 MB  first byte    2.45 ms  done    2.77 ms  buffered pkts 1124    tries 1
+  #8    snapshot   expected 2155704    saw 2155707    resume@2155821       15832 msgs    0.63 MB  first byte    2.52 ms  done    2.87 ms  buffered pkts 1392    tries 1
+  #9    snapshot   expected 2421918    saw 2421921    resume@2422037       16288 msgs    0.65 MB  first byte    2.42 ms  done    2.79 ms  buffered pkts 1367    tries 1
+  #10   snapshot   expected 2691402    saw 2691405    resume@2691623       18923 msgs    0.75 MB  first byte    4.30 ms  done    4.71 ms  buffered pkts 2111    tries 1
+  #11   snapshot   expected 2956045    saw 2956048    resume@2956169       19727 msgs    0.78 MB  first byte    2.64 ms  done    3.10 ms  buffered pkts 1515    tries 1
+book: adds 1189362 execs 5980 execs w/price 0 cancels 385562 deletes 1099161 replaces 149179
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 19371 replayed)
+  (4 cross-core TSC readings went backwards and were clamped to 0)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)         2736209     1520     1680    12160     97280    1305011      2125
+  2 user -> queued (parse)        2736209      134      186     2720     13184     317041       252
+  3 queue hop (feed->book)        2736209      146      300    56832   2129920    5432890      9043
+  4 book apply                    2736209      111      190      420      1072    1168499       131
+    user -> book (2+3+4)          2736209      380      760    60928   2129920    5435003      9427
+  = WIRE -> BOOK (1..4)           2736209     1904     2656    76800   2129920    5529385     11551
+  book apply by message type:
+      add (A/F)                   1107719      103      174      372      1904     713411       130
+      execute (E)                    5920      142      396      904     11904      45992       218
+      execute w/ price (C)   (no samples)
+      cancel (X)                   383008       81      130      162       254    1168499        86
+      delete (D)                  1091459      123      206      452       952     223064       138
+      replace (U)                  148103      162      276      584      1136      48908       191
+
+final books: 8906 instruments, 13831 resting orders, digest f58b799cfb687bf5
+server books: digest f58b799cfb687bf5 at seq<3000001 (13831 orders)  ->  MATCH: books identical to the publisher's

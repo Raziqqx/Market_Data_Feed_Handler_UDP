@@ -1,0 +1,29 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+==================== feed handler report ====================
+packets 4893708  bytes 247526904  messages 5000000  pushed to book 4770827  (50.19 s)
+heartbeats 0  duplicate/old packets 0  bad packets 0  bad messages 0
+loss: simulated drops 0  kernel socket drops 0  ring-full events 0  queue-full waits 0
+gaps 0  (messages missed on the wire 0)  -> retransmissions 0 (0 msgs)  snapshots 0 (0 msgs, book resets 0)
+recovery buffer: peak 0.0 MB, packets lost to its cap 0
+book: adds 2106674 execs 24571 execs w/price 0 cancels 503012 deletes 1861525 replaces 257236
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 0 replayed)
+  (447 cross-core TSC readings went backwards and were clamped to 0)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)         4753018     1616     1840    12672    121856    9788558      2397
+  2 user -> queued (parse)        4753018      138      186      840      7232    1353331       178
+  3 queue hop (feed->book)        4753018      154      214    17664    454656   10421568      5806
+  4 book apply                    4753018      109      308     1000      2000    9891858       168
+    user -> book (2+3+4)          4753018      404      744    19200    454656   10425218      6152
+  = WIRE -> BOOK (1..4)           4753018     2032     2592    40448    614400   10428427      8549
+  book apply by message type:
+      add (A/F)                   2106674      105      292     1040      2144     177396       165
+      execute (E)                   24571      186      728     1520      3488      28097       320
+      execute w/ price (C)   (no samples)
+      cancel (X)                   503012       81       93      170       584     116704        73
+      delete (D)                  1861525      121      324      936      1872    9891858       181
+      replace (U)                  257236      182      520     1200      2656      53276       274
+
+final books: 8906 instruments, 231866 resting orders, digest 0bce285c8e8c1e18
+server books: digest 0bce285c8e8c1e18 at seq<5000001 (231866 orders)  ->  MATCH: books identical to the publisher's

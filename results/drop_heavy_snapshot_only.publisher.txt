@@ -1,0 +1,25 @@
+[publisher] /home/raziq/itch-data/12302019.NASDAQ_ITCH50 (8.25 GB) -> 239.1.1.1:30001 via 127.0.0.1, snapshot server on 127.0.0.1:31001
+[publisher] starting at seq 60000001
+[snapshot] served seq<60006401: 1738962 msgs, 66.1 MB, built in 252.1 ms
+[snapshot] served seq<60325357: 1739619 msgs, 66.1 MB, built in 142.4 ms
+[publisher] seq 60524289  500001 msg/s  packets 489621  dropped 255
+[snapshot] served seq<60541625: 1739808 msgs, 66.1 MB, built in 138.2 ms
+[snapshot] served seq<60752009: 1739605 msgs, 66.1 MB, built in 140.2 ms
+[snapshot] served seq<60965280: 1739363 msgs, 66.1 MB, built in 139.0 ms
+[publisher] seq 61048577  500000 msg/s  packets 977571  dropped 489
+[snapshot] served seq<61174773: 1739389 msgs, 66.1 MB, built in 137.9 ms
+[snapshot] served seq<61384327: 1739796 msgs, 66.1 MB, built in 135.2 ms
+[publisher] seq 61572865  500000 msg/s  packets 1469677  dropped 735
+[snapshot] served seq<61601633: 1739450 msgs, 66.1 MB, built in 135.5 ms
+[snapshot] served seq<61809791: 1738888 msgs, 66.1 MB, built in 135.3 ms
+[publisher] seq 62097153  500000 msg/s  packets 1959636  dropped 965
+[snapshot] served seq<62021060: 1738911 msgs, 66.1 MB, built in 165.5 ms
+[snapshot] served seq<62250235: 1739292 msgs, 66.1 MB, built in 137.5 ms
+[snapshot] served seq<62457381: 1739887 msgs, 66.1 MB, built in 140.2 ms
+[publisher] seq 62621441  500000 msg/s  packets 2449619  dropped 1225
+[snapshot] served seq<62670732: 1740357 msgs, 66.2 MB, built in 136.2 ms
+[snapshot] served seq<62880104: 1740000 msgs, 66.1 MB, built in 137.4 ms
+[publisher] done: 3000000 msgs in 6.00 s (500000 msg/s), 2804128 packets, deliberately dropped 1401 packets (1563 msgs), last seq 63000000
+[snapshot] served seq<63000001: 1740541 msgs, 66.2 MB, built in 158.8 ms
+[snapshot] digest at seq<63000001: ce4ff04802569dbd (1731624 orders, 8906 books)
+[publisher] snapshot server: 15 snapshots, 0 retransmissions, 1 digests served

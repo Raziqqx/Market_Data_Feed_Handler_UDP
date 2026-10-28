@@ -1,0 +1,934 @@
+===============================================================================
+ P4  MARKET DATA FEED HANDLER + REPLAY OVER UDP MULTICAST
+ Everything you need to know: what was built, why every decision was made, how
+ it was proven correct, what went wrong along the way (and how each problem was
+ found and fixed), how to read the latency numbers, and how to talk about it.
+===============================================================================
+
+CONTENTS
+  0. The 60-second pitch
+  1. The assignment, point by point, and where each is met
+  2. Repository map
+  3. How to build, test, run and demo it
+  4. Background you need (multicast, sequencing, MoldUDP64, epoll, ...)
+  5. The architecture: the life of one packet
+  6. Design decisions, one by one, with the reason for each
+  7. Gap detection and recovery in detail (and why it is gap-free)
+  8. Latency: how each stage is measured, results, how to read them
+  9. How correctness is proven
+ 10. Hurdles a student hits on this project, and how to solve each one
+     (including every real problem hit while building this one)
+ 11. Interview questions with crisp answers
+ 12. Extensions if you want to go further
+ 13. Glossary
+
+
+-------------------------------------------------------------------------------
+0. THE 60-SECOND PITCH
+-------------------------------------------------------------------------------
+"I built the market-data path of a trading system. A publisher replays a full
+day of real NASDAQ ITCH 5.0 data as MoldUDP64 packets over UDP multicast, the
+same framing NASDAQ uses in production, at a controllable speed, and can drop
+packets on purpose. The feed handler receives it with epoll and non-blocking
+sockets, using recvmmsg straight into a preallocated packet ring, and parses
+the binary messages in place with no copies. It detects gaps by sequence
+number and recovers over TCP. Small gaps are filled by retransmission in about
+0.35 ms. Large gaps or a late join are recovered from a full snapshot of every
+order book, while the live feed is buffered and then replayed, so nothing is
+lost in the hand-off. Parsed updates go through my lock-free SPSC queue to my
+order book on a separate pinned thread.
+
+Every run ends by comparing a digest of all the handler's books (every order,
+in exact queue priority) with the publisher's: they match in every scenario,
+including 1,400 gaps on a 1.7-million-order book and a late join at 10:00.
+Wire-to-book latency at 500k msg/s is about 1.9 us at the median. Most of that
+is the kernel's network path; my user-space path (parse, queue hop, book
+update) is about 380 ns."
+
+Re-measure before quoting numbers: they depend on the machine (section 8).
+
+
+-------------------------------------------------------------------------------
+1. THE ASSIGNMENT, POINT BY POINT
+-------------------------------------------------------------------------------
+"A publisher that replays the ITCH file as UDP multicast packets with sequence
+ numbers, at controllable speed."
+   -> src/publisher.cpp. MoldUDP64 packets (session, 64-bit sequence number,
+      message count). Speed: --speed X (X times real time, using the ITCH
+      timestamps), --rate N (N messages/second), or neither (flat out).
+      --skip N fast-forwards, --count N limits the run. Deliberate loss:
+      --drop-every N --drop-burst B, --drop-prob P.
+
+"A subscriber that parses binary messages with zero copies, detects gaps, and
+ requests recovery from a TCP snapshot server."
+   -> src/subscriber.cpp, feed thread. recvmmsg writes datagrams directly into
+      preallocated ring slots. The parser reads fields straight out of those
+      slots and decodes each event directly into a slot of the SPSC queue. Gap =
+      packet sequence number > the next one expected. Recovery is over TCP from
+      the snapshot server that runs inside the publisher process: full snapshot
+      ('S'), plus retransmission ('R') for small gaps (the industry-standard
+      two-tier design, section 7). --retransmit-max 0 gives snapshot-only
+      recovery, which is what the assignment literally asks for.
+
+"The subscriber passes parsed updates to the P3 order book through the P2
+ queue, each on its own pinned thread."
+   -> feed thread (default cpu 2) -> SpscQueue<Update> -> book thread (cpu 4)
+      -> P3 itch::BookBuilder / lob::OrderBook. Pinning: pthread_setaffinity_np.
+      The P3 code is vendored in external/lob/. The P2 queue is
+      include/feed/spsc_queue.hpp. NOTE: no separate P2 repository was found in
+      your GitHub folder, so the queue was written here. If you have your own
+      P2 queue, swap it in: the feed handler uses only claim()/publish() on the
+      producer side and front()/pop() on the consumer side.
+
+"Use epoll and non-blocking sockets; measure wire-to-book latency."
+   -> Every socket is O_NONBLOCK. The feed thread is an epoll loop over the
+      UDP socket and (during recovery) the TCP connection. The snapshot server
+      is an epoll loop over its listening socket and clients. The TCP connect
+      itself is non-blocking (EINPROGRESS + EPOLLOUT). Latency: the kernel
+      timestamps each datagram (SO_TIMESTAMPNS), and the handler stamps the
+      TSC at receive, at enqueue, at dequeue and after the book update.
+
+"Done when: you can deliberately drop packets and show the handler recovering,
+ and you have a latency breakdown per stage."
+   -> scripts/run_demo.sh runs 7 loss scenarios; every one ends with
+      "MATCH: books identical to the publisher's". Each report has a per-stage
+      latency table (p50/p90/p99/p99.9/max/mean) plus book latency by message
+      type. Output is saved in results/.
+
+
+-------------------------------------------------------------------------------
+2. REPOSITORY MAP
+-------------------------------------------------------------------------------
+include/feed/spsc_queue.hpp     P2. Bounded lock-free single-producer/single-
+                                consumer ring. Free-running 64-bit indices,
+                                producer and consumer index on separate cache
+                                lines, cached copies of the other side's index,
+                                acquire/release ordering, in-place
+                                claim()/publish() and front()/pop().
+include/feed/moldudp64.hpp      MoldUDP64 framing: PacketBuilder (publisher),
+                                parse_header -> PacketView (subscriber,
+                                zero-copy). Heartbeat and end-of-session.
+include/feed/update.hpp         Update: the 64-byte (one cache line) queue
+                                element. decode_into(): ITCH bytes -> Update.
+                                apply(): Update -> P3 BookBuilder.
+include/feed/snapshot.hpp       TCP recovery protocol ('S','R','D'), snapshot
+                                serialisation (books -> ITCH messages), book
+                                digest.
+include/feed/pending_buffer.hpp Chunked FIFO that holds the live feed while a
+                                recovery is in flight.
+include/feed/net.hpp            Socket helpers: multicast sender/receiver,
+                                buffers, timestamps, non-blocking TCP, epoll.
+include/feed/util.hpp           Thread pinning, clocks, option parser.
+src/publisher.cpp               feed_publisher: replay thread + snapshot/
+                                retransmission server thread.
+src/subscriber.cpp              feed_handler: feed thread, book thread, report,
+                                end-of-run digest check.
+src/queue_bench.cpp             The SPSC queue alone: throughput and one-way
+                                hand-off latency between two pinned threads.
+tests/test_main.cpp             Unit tests (queue, framing, decode, snapshot
+                                round trip incl. stale books, digest priority
+                                sensitivity, pending buffer).
+external/lob/                   P3 (order book + ITCH decoder), copied from
+                                "Limit order book" commit db87379. Three small
+                                additions, each marked "[feed handler
+                                addition]": OrderBook::for_each_order (walk
+                                orders in priority order), OrderBook::clear
+                                and BookBuilder::clear (empty books without
+                                freeing memory).
+scripts/common.sh               run_case helper: starts handler, waits until
+                                ready, runs publisher, collects logs.
+scripts/run_demo.sh             The drop/recovery scenarios.
+scripts/run_latency.sh          Load and polling-mode sweep + queue_bench.
+results/                        Output of those scripts.
+
+
+-------------------------------------------------------------------------------
+3. HOW TO BUILD, TEST, RUN AND DEMO IT
+-------------------------------------------------------------------------------
+Needs: Linux (WSL2 is fine), g++ >= 9 or clang, CMake >= 3.16, and the ITCH
+file (~8.25 GB decompressed; the P3 repo's scripts/get_data.sh fetches it to
+~/itch-data/12302019.NASDAQ_ITCH50).
+
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+  cmake --build build -j
+  ./build/feed_tests                      # "2049 checks passed, 0 failed"
+  scripts/run_demo.sh                     # ~3 minutes, writes results/
+  scripts/run_latency.sh                  # ~4 minutes, writes results/
+
+By hand (two terminals; start the handler first, it waits for packets):
+  ./build/feed_handler --prefault
+  ./build/feed_publisher ~/itch-data/12302019.NASDAQ_ITCH50 \
+        --count 3000000 --rate 500000 --drop-every 250000 --drop-burst 3
+
+What you will see in the handler's terminal:
+  [feed] GAP: expected seq 264297, got 264300 (3 msgs missing) -> requesting retransmission
+  [feed] RECOVERED by retransmission: 3 msgs (0.00 MB), resume at seq 264300, 0.44 ms; ...
+and at the end a report: packet/loss counters, one line per recovery,
+consistency counters (unknown order refs etc., all must be 0), the latency
+table, and "server books: digest ... -> MATCH".
+
+Useful variations:
+  --retransmit-max 0      on the handler: snapshot-only recovery
+  --skip 60000000         on the publisher: start at ~10:00, so the handler
+                          must bootstrap from a big snapshot (late join)
+  --drop-prob 0.001       on either side: random loss
+  --speed 1               real time (the first messages are at 03:xx, so
+                          expect long quiet stretches with heartbeats)
+  --blocking              on the handler: epoll_wait blocks instead of spins
+
+Ports: multicast 239.1.1.1:30001 on 127.0.0.1, TCP 31001. If a run is killed,
+wait for the previous publisher to exit (it lingers 10 s by default to serve
+late recoveries) or you get "bind(tcp 31001): Address already in use".
+
+
+-------------------------------------------------------------------------------
+4. BACKGROUND YOU NEED
+-------------------------------------------------------------------------------
+4.1 Why market data uses UDP multicast
+  An exchange has to send the same stream to hundreds of firms at the same
+  moment. With TCP it would keep one connection, one send buffer and one
+  retransmission state per client, and a slow client slows the sender (flow
+  control). With multicast, the sender emits each packet once and the switches
+  copy it to every subscribed port. Everyone gets it at the same time, the
+  sender does not care who is listening, and a slow receiver only hurts itself.
+  The price: UDP gives no delivery or ordering guarantee. Packets can be lost
+  (switch buffer overflow, NIC ring overflow, socket buffer overflow, a
+  receiver that was not reading fast enough), duplicated or reordered. So the
+  protocol on top must let a receiver notice loss and repair it. That is what
+  sequence numbers plus a recovery service are for.
+
+4.2 Sequence numbers
+  Every message gets a number: 1, 2, 3, ... A receiver remembers the next
+  number it needs ("expected"). A packet starting at a higher number means
+  messages were lost: a GAP. A lower number means it is a duplicate or old,
+  and it is ignored. In MoldUDP64 the numbers count MESSAGES, not packets. A
+  packet says "my first message is N and I contain C messages".
+
+4.3 MoldUDP64 (what this project puts on the wire)
+    offset  0  Session          10 bytes  ASCII
+    offset 10  Sequence Number   8 bytes  big-endian, seq of first message
+    offset 18  Message Count     2 bytes  big-endian
+    offset 20  [2-byte length][message] x Message Count
+  Count 0 = heartbeat (sequence = next to be sent: lets a receiver notice it
+  lost the tail of a burst even when nothing new is being sent). Count 0xFFFF =
+  end of session. NASDAQ's real feed uses exactly this. Its recovery is a
+  separate "request server" that retransmits ranges of messages.
+
+4.4 ITCH 5.0 in one paragraph (details in the P3 notes)
+  Binary, big-endian, fixed-size messages, each starting with type(1),
+  stock locate(2), tracking(2), timestamp(6, ns since midnight). The book
+  events are Add (A/F), Execute (E), Execute with price (C), Cancel (X),
+  Delete (D) and Replace (U). Orders are referenced by a 64-bit order number,
+  so applying an E/X/D/U requires that you saw the Add. Miss one Add and every
+  later message for that order hits an "unknown order". That is why gaps must
+  be repaired, not skipped.
+
+4.5 Recovery: retransmission vs snapshot
+  Retransmission: "resend messages 1000..1003". Cheap for small gaps, and the
+  book is never thrown away. It needs the server to keep recent history.
+  Snapshot: "send me the full state of every book as of message N". Works for
+  any gap size, including joining late, but costs O(size of all books) (here
+  up to ~66 MB for 1.7M orders) and the receiver must rebuild everything.
+  Real feeds offer both. The receiver also has to handle the hand-off: live
+  messages keep arriving while the snapshot is in flight (section 7).
+
+4.6 epoll and non-blocking sockets
+  A non-blocking socket never puts the thread to sleep: recv returns EAGAIN
+  when there is nothing to read, send returns EAGAIN when the buffer is full,
+  and connect returns EINPROGRESS immediately. epoll tells you which of many
+  sockets are ready, so one thread can serve the UDP feed and a TCP recovery
+  connection without ever blocking on either. With epoll_wait(timeout = 0)
+  the thread spins (busy-polls): the lowest latency, at the cost of a full
+  core. With a timeout it sleeps until the kernel wakes it: cheaper, slower.
+
+4.7 Zero-copy parsing
+  The datagram lands in a buffer that recvmmsg fills. The parser never copies
+  the packet anywhere. It reads each field (be64(p + 11), ...) straight from
+  that buffer and writes the decoded event straight into the queue slot the
+  book thread will read. The only bytes copied are the decoded fields, which
+  the book needs in host byte order anyway. ("Zero-copy" in market data
+  usually means exactly this: no intermediate copy of the packet or message.
+  Kernel-bypass stacks remove even the kernel-to-user copy, see section 12.)
+
+4.8 SPSC queue and thread pinning
+  One producer and one consumer means the queue needs no locks and no
+  compare-and-swap, only two indices and acquire/release ordering (see the
+  header comment). Pinning a thread to a CPU keeps its caches warm and stops
+  the scheduler moving it mid-burst. Put the two threads on different
+  PHYSICAL cores: on this machine CPUs 2k and 2k+1 are hyper-thread siblings
+  (lscpu -e), so 2, 4, 6, 8 are four separate cores.
+
+4.9 TSC
+  rdtsc reads a per-core cycle counter in ~20 cycles, with no syscall. On
+  modern x86 it ticks at a constant rate ("constant_tsc nonstop_tsc" in
+  /proc/cpuinfo), so one calibration factor converts ticks to ns. Readings on
+  different cores are synchronised by the hardware, but under a hypervisor
+  they can disagree by a few ns (section 10, hurdle 15).
+
+
+-------------------------------------------------------------------------------
+5. THE ARCHITECTURE: THE LIFE OF ONE PACKET
+-------------------------------------------------------------------------------
+Publisher process (feed_publisher):
+  1. The ITCH file is mmap'd read-only. The publisher thread walks it,
+     [len][msg][len][msg]...
+  2. Each message gets the next sequence number. A pointer to it (into the
+     mmap, nothing copied) is pushed onto an SPSC queue for the snapshot
+     thread. The snapshot thread applies EVERY message, including ones that
+     will be "dropped", to its own P3 books: it holds the truth.
+  3. Pacing: the message's due time is computed from --rate or --speed. If
+     it is in the future, the current packet is sent and the thread waits
+     (spinning for short waits, sleeping for long ones, sending heartbeats
+     when idle for 1 s).
+  4. Messages are packed into the current packet until the next one would
+     push it past 1400 bytes. Full packets are batched and sent 32 at a time
+     with sendmmsg. A packet chosen for deliberate loss is simply not sent:
+     its sequence numbers are spent, so receivers see a gap.
+  5. At the end, End of Session is sent, and repeated every heartbeat interval
+     while the process lingers, so the snapshot server stays available.
+
+Handler process (feed_handler), feed thread:
+  6. epoll reports the UDP socket readable. drain_udp() calls recvmmsg into
+     up to 64 free ring slots. For each datagram the kernel attaches a
+     receive timestamp (SO_TIMESTAMPNS) and the socket's drop counter
+     (SO_RXQ_OVFL). The thread stamps rdtsc() and CLOCK_REALTIME right after
+     recvmmsg returns.
+  7. process() takes the oldest packet. Header parsed in place. If its
+     sequence > expected -> GAP -> recovery (section 7). Heartbeat -> nothing.
+     All messages older than expected -> duplicate, ignored.
+  8. For each message in the packet: messages below expected are skipped (a
+     recovery already covered them), lengths are checked against the ITCH
+     spec, and types the book does not need (trades, NOII, ...) are counted
+     but not forwarded. For a book event: claim() a queue slot, decode the
+     fields from the packet into it, set seq / timestamps, publish().
+  9. If the queue is full (the book thread is behind), claim() keeps draining
+     the UDP socket while it waits, so a slow consumer does not turn into
+     kernel packet loss.
+
+Handler process, book thread:
+ 10. front() -> stamp t_pop -> apply to P3 BookBuilder -> stamp t_done ->
+     record the stage latencies -> pop(). Control updates: Reset (empty the
+     books, a snapshot follows), SnapshotDone, EndOfSession (compute the
+     digest, exit).
+
+End of run:
+ 11. The handler sends a 'D' request with the final sequence number. The
+     server answers with the digest of its books at exactly that point, and
+     the handler prints MATCH or MISMATCH (exit code 1 on mismatch).
+
+
+-------------------------------------------------------------------------------
+6. DESIGN DECISIONS, ONE BY ONE
+-------------------------------------------------------------------------------
+D1. MoldUDP64 framing, not a made-up header.
+    It is what NASDAQ actually uses for ITCH, so the design is realistic and
+    you can say so in an interview. It numbers messages, not packets, which
+    lets a recovery start or end mid-packet. Heartbeats and end of session
+    are built in.
+
+D2. 1400-byte max payload.
+    1500-byte Ethernet MTU - 20 (IP) - 8 (UDP) = 1472. Staying under it means
+    no IP fragmentation, and that matters: losing ONE fragment loses the WHOLE
+    datagram, so fragmentation multiplies the loss rate. 1400 leaves room for
+    tunnels/VLAN tags. (Loopback's MTU is 64 KB, but the design should work on
+    a real network.)
+
+D3. Snapshot server inside the publisher process, fed by an SPSC queue of
+    pointers into the mmap'd file.
+    The recovery service must be a source of truth that never loses data. If
+    it were a separate process listening to the same multicast, it could
+    lose packets too. Real exchanges feed snapshot/retransmission servers
+    internally from the matching engine. The pointer queue is zero-copy (the
+    file is mapped and immutable), and the P2 queue gets reused. If the
+    server falls behind, the publisher waits (backpressure) rather than drop:
+    the truth must be complete.
+
+D4. The snapshot is expressed AS ITCH MESSAGES ('S', 'R', 'H', then one 'A'
+    per resting order, best price first, oldest first within a price).
+    Replaying those into empty books rebuilds the exact same books, queue
+    priority included. Benefits: the client uses the same decoder and the
+    same apply() as the live feed (no second parser to get wrong). The
+    snapshot is self-describing and testable offline. Priority order matters:
+    a snapshot that listed orders in hash-table order would rebuild books with
+    the right prices and sizes but the WRONG queue positions. The book digest
+    (D11) would catch that, and so would a unit test (test_digest_priority).
+
+D5. Two-tier recovery: retransmission for gaps <= 50,000 messages, snapshot
+    otherwise (or when the server's 2M-message history no longer has them).
+    Snapshot-only recovery has a cost proportional to the size of ALL books,
+    paid for every lost packet, however small. Measured: a 3-message gap on
+    a 1.7M-order book cost a 66 MB snapshot and ~450 ms; by retransmission
+    it costs ~0.4 ms. Worse, if packets are lost more often than a snapshot
+    takes, the handler never gets back to live (results/drop_heavy_snapshot_
+    only). Retransmission makes recovery cost proportional to the GAP.
+    --retransmit-max 0 turns it off, to demonstrate pure snapshot recovery as
+    the assignment specifies.
+
+D6. Recovery hand-off: buffer the live feed, ask for state "at least as new
+    as" the first buffered message, then replay the buffer skipping what the
+    state already covers. Section 7 explains why this has no gap and no
+    double-apply.
+
+D7. The receive ring is also the landing zone. During recovery, packets are
+    copied into a compact chunked pending buffer.
+    recvmmsg needs fixed-size buffers big enough for the largest datagram
+    (2 KB slots), but typical packets here are 40-100 bytes. A big recovery
+    lasts ~0.8 s, during which ~370k packets arrive: 740 MB as ring slots,
+    ~32 MB packed. Copying is fine on the recovery path; the hot path stays
+    zero-copy. Chunks never move, so a pointer to the packet being processed
+    stays valid while new ones are appended (the feed thread keeps draining
+    the socket mid-processing).
+
+D8. One 64-byte Update per queue slot (one cache line).
+    The producer writes exactly one line and the consumer reads exactly one
+    line per message; neighbouring slots never share a line. Fields are
+    unioned where types do not overlap (new_ref for 'U', the stock symbol for
+    'A'/'R'/'H') to fit. Only book-relevant types cross the queue.
+
+D9. claim()/publish() and front()/pop() instead of push(copy)/pop(copy).
+    The producer decodes straight into the slot and the consumer applies
+    straight from it: no temporary, no second copy.
+
+D10. Free-running 64-bit indices with cached opposite index in the queue.
+    Full is "tail - head == capacity" and empty is "tail == head": no wasted
+    slot, no flag. Without caching, every push would read the consumer's
+    index, a cache line the consumer keeps writing, so the line would
+    ping-pong between cores on every message. With caching, each side
+    re-reads only when the cached copy says full/empty. Measured: ~89 M
+    updates/s, 138 ns one-way hand-off (results/queue_bench.txt).
+
+D11. Proof by digest: FNV-1a over (locate, side, order id, price, qty) for
+    every order in every book, walked in priority order.
+    A cheap end-to-end check that the handler's books are exactly the
+    publisher's, including queue position. The digest is order-sensitive on
+    purpose. The server computes it at exactly the sequence number the
+    handler asks for (it waits until it has applied that far).
+
+D12. Clear the books in place on a snapshot; do not rebuild the BookBuilder.
+    The first version destroyed and re-created it (unmap, map, prefault ~1 GB).
+    That stalled the book thread for ~300 ms, which filled the queue, then the
+    packet ring, then the kernel socket buffer: one gap caused the next.
+    clear() removes every order (O(live orders)) and keeps every page mapped
+    and warm.
+
+D13. Book memory sized for the full day: 16M order pool (so a 32M-slot
+    order-id table), prefaulted at start (--prefault).
+    See hurdle 13: a smaller id table caused severe hash clustering at 09:32.
+    Prefaulting means no page faults on the hot path; without it the first
+    touch of each 2 MB huge page costs up to milliseconds.
+
+D14. Busy-polling epoll by default, --blocking available.
+    Spinning avoids the wake-up latency of a sleeping thread. Costs: a full
+    core per spinning thread, and it reveals nothing about idle time. Both
+    are measured (section 8).
+
+D15. Kernel receive timestamps (SO_TIMESTAMPNS) as the "wire" time.
+    On a real NIC you would use hardware timestamps (SO_TIMESTAMPING); on
+    loopback the kernel stamps the packet when it enters the receive path,
+    which is the closest thing to "wire" there is. Stage 1 = user receive
+    time - kernel timestamp (both CLOCK_REALTIME). The later stages use rdtsc,
+    which is far cheaper than clock_gettime and fine for intra-process deltas.
+
+D16. Latency is reported only for LIVE messages.
+    Messages from a snapshot, retransmitted messages and packets buffered
+    during a recovery are excluded (counted as "replayed"): their "latency"
+    would be the recovery time, which is reported separately per recovery.
+    Mixing them in would make the live-path percentiles meaningless.
+
+D17. Histograms, not samples: P3's log-linear histogram (< 3.2% error, fixed
+    size, one increment per record). Recording costs a few ns and never
+    allocates, so measuring does not disturb what is measured.
+
+D18. End of Session repeated during linger (as MoldUDP64 servers do).
+    A single EOS can be lost, or arrive while the handler is mid-recovery.
+    Without repetition the handler never learns the final sequence number.
+
+D19. Messages the book does not use are sequenced and counted but never
+    queued (trades 'P', NOII 'I', ...). That saves queue bandwidth. Gap
+    detection still covers them, because the sequence numbers include them.
+
+D20. Everything allocated up front: ring, mmsghdr/iovec/cmsg arrays, queue,
+    books, snapshot receive buffer. They are also touched at startup (see
+    hurdle 14). The only allocations after startup are on the recovery path
+    (pending-buffer chunks, recycled after the first use).
+
+
+-------------------------------------------------------------------------------
+7. GAP DETECTION AND RECOVERY IN DETAIL
+-------------------------------------------------------------------------------
+State on the feed thread:
+  expected      next sequence number needed
+  recovering    true from gap detection until the response is fully applied
+  pend_         packets that arrived since the gap (oldest first)
+
+Detection (handle_packet):
+  seq >  expected -> GAP (this packet is NOT consumed: it is the first
+                     buffered packet)
+  seq + count <= expected -> entirely old: ignore
+  otherwise          process messages with msg_seq >= expected, advancing
+                     expected one message at a time
+  Heartbeats and End of Session carry a sequence number too, so a gap at the
+  tail (nothing sent afterwards) is still detected.
+
+On a gap at sequence `seen` (expected = E):
+  1. Move the ring contents (starting with the gap packet) to pend_. From now
+     on drain_udp() appends every arriving packet to pend_.
+  2. If seen - E <= retransmit_max: request 'R' [E, seen). Otherwise request
+     'S' with min_seq = seen.
+  3. The server answers only once it has applied every message < seen (it
+     waits if it is behind), so the response never ends before the first
+     buffered packet starts.
+  4. 'R': the messages are decoded and applied like live ones; expected
+     advances to seen. 'R' with count 0 means "too old for my history": the
+     handler immediately asks for a snapshot instead.
+     'S': push Reset (the book thread empties the books), then every snapshot
+     message, then SnapshotDone; expected = the snapshot's next_seq (N >= seen).
+  5. recovering = false. process() now replays pend_ in order. Messages with
+     seq < expected are skipped: those are covered by the snapshot. When pend_
+     is empty, processing goes back to the ring.
+
+Why this has no gap and no double-apply (the key interview point):
+  Let F = the first sequence in pend_ (F = seen). Everything received after
+  the gap is in pend_, in arrival order, from F onward.
+  - Retransmission covers [E, F). Then pend_ supplies F onward. Nothing is
+    missing, and nothing is applied twice (each message is applied only if
+    its seq >= expected, and expected only moves forward).
+  - A snapshot covers every message < N with N >= F (the server guarantees
+    N >= min_seq = F). pend_ contains everything from F on, so it contains
+    N, N+1, ... Messages F..N-1 in pend_ are skipped because they are below
+    expected = N. Nothing missing, nothing doubled.
+  - If pend_ itself has a hole (the kernel dropped something during the
+    recovery), the replay simply detects another gap, and the same procedure
+    repeats. Correctness never depends on loss NOT happening.
+  - If the server is unreachable, the handler retries every 200 ms; it keeps
+    buffering meanwhile, up to a 1 GB cap. Past the cap, packets are lost and
+    caught as a new gap.
+
+Why the gap packet must not be consumed: it is the first message the handler
+has after the hole. If processing simply skipped ahead, the book would apply
+F.. while E..F-1 were missing: every order added in the hole would later be
+"unknown". Holding it in pend_ and requesting [E, F) keeps strict order.
+
+Why the snapshot must not be older than F: if it covered only < N with N < F,
+messages N..F-1 would be in neither the snapshot nor pend_. That is why the
+request carries min_seq and the server waits.
+
+
+-------------------------------------------------------------------------------
+8. LATENCY: HOW EACH STAGE IS MEASURED, RESULTS, HOW TO READ THEM
+-------------------------------------------------------------------------------
+Stamps (per message, carried in the Update):
+  T0 kernel receive timestamp of the datagram     (SO_TIMESTAMPNS, REALTIME)
+  T1 right after recvmmsg returned                (CLOCK_REALTIME + rdtsc)
+  T2 decoded update published to the queue        (rdtsc, feed thread)
+  T3 popped by the book thread                    (rdtsc, book thread)
+  T4 book update finished                         (rdtsc, book thread)
+
+  stage 1  wire -> user        T1 - T0   kernel: softirq, socket queue, the
+                                         time until our loop reads it, and
+                                         waiting behind other datagrams in
+                                         the same recvmmsg batch
+  stage 2  user -> queued      T2 - T1   header + message parse, decode into
+                                         slot; includes waiting behind earlier
+                                         messages of the same batch
+  stage 3  queue hop           T3 - T2   cross-core hand-off; includes waiting
+                                         behind earlier messages in the queue
+  stage 4  book apply          T4 - T3   P3 order book
+  total    wire -> book        (T1 - T0) + (T4 - T1)
+
+RESULTS (this machine: i5-14500HX, WSL2, loopback multicast, --prefault, busy
+polling, feed cpu 2, book cpu 4; ns; live messages only)
+
+  At 500k msg/s, two-tier drop run (results/drop_retransmit.handler.txt):
+                               p50     p90     p99    p99.9
+    1 wire -> user            1520    1744   12928    72704
+    2 user -> queued           134     186    2784     8320
+    3 queue hop                142     242   35328   153600
+    4 book apply               105     182     476     1456
+    WIRE -> BOOK              1904    2528   48640   186368
+    book apply by type p50: add 99, execute 142, cancel 79, delete 119,
+    replace 154
+
+  Queue alone (results/queue_bench.txt): ~89 M updates/s; one-way hand-off
+  p50 138 ns, p99 186 ns, p99.9 300 ns (max ~2.7 ms: a host preemption).
+
+  LOAD AND POLLING-MODE SWEEP (results/latency_*.handler.txt):
+  5M messages from the open of the file, no deliberate loss, all runs MATCH.
+  WIRE -> BOOK, ns:                        p50     p90      p99     p99.9
+    busy poll, 100k msg/s                 2032    2592    40448    614400
+    busy poll, 500k msg/s                 2000    3296    42496    356352
+    busy poll, 1M msg/s                   2032    5696    84992    454656
+    busy poll, 2M msg/s                   2272   16640  2015232   4259840
+    BLOCKING epoll, 500k msg/s            5056   23808   137216    323584
+    busy poll, NO prefault, 500k msg/s    1936    7360  3964928  42467328
+  Where the differences come from (per-stage tables are in the files):
+    - load: stage 4 (book) stays ~100 ns at p50 at every rate. Stage 3 (queue
+      hop) p99 goes 17 us -> 27 us -> 71 us -> 2 ms. Higher utilisation means
+      more waiting behind earlier messages.
+    - blocking: stage 1 p50 1.6 -> 4.0 us. The thread is asleep in
+      epoll_wait, and the wake-up is now on the critical path.
+    - no prefault: stage 3 p99 27 us -> 4 ms. The book thread takes page
+      faults as the books grow, and every message behind it waits.
+    - the 500k busy run had 2 gaps from kernel drops early in the run, both
+      repaired by retransmission (4,932 messages).
+
+How to read these numbers:
+  * The median is dominated by stage 1, the kernel path (~1.5 us on this VM;
+    on bare metal with a tuned kernel it is lower, and with kernel bypass it
+    nearly disappears). The user-space path (2+3+4) is ~380-500 ns at p50.
+  * Stage 3 at p50 (~140-230 ns) equals the bare queue hand-off: when the
+    book thread is idle, the hop is just the cache-line transfer.
+  * The tails (p99 and up) are QUEUEING, not slow code. Book apply p99 is
+    ~0.5-0.7 us, but a burst of messages in one packet, or a burst of
+    packets, makes later messages wait behind earlier ones (stages 2 and 3).
+    Then there are OS/VM interruptions: under WSL2 the vCPUs are threads that
+    the Windows host can preempt. The bare queue benchmark shows it: p99 186
+    ns, but max ~2.7 ms with nothing else running.
+  * Higher load -> more queueing -> fatter tails, even though per-message
+    cost is unchanged. That is normal queueing behaviour: latency rises
+    steeply as utilisation approaches 1.
+  * Without --prefault the first touch of each page in the book costs a
+    page fault, which shows up as a heavy tail (and a burst of them early in
+    the session, when the books grow fastest).
+  * Blocking epoll: the thread sleeps, and waking it costs microseconds, so
+    the stages that depend on the feed thread reacting get slower. You trade
+    latency for a free core.
+  * "cross-core TSC readings went backwards" counts stage-3 samples where
+    T3 < T2 (different cores, slightly different TSC). They are clamped to 0.
+    A few per million is normal under a hypervisor.
+  * Coordinated omission: the publisher is paced by a schedule, and the
+    handler stamps every message, so a stall is visible in every message that
+    waited behind it (it is not hidden by measuring only messages that got
+    through quickly). Messages buffered during a recovery are excluded and
+    accounted for as recovery time instead (D16).
+
+
+-------------------------------------------------------------------------------
+9. HOW CORRECTNESS IS PROVEN
+-------------------------------------------------------------------------------
+  1. End-to-end digest after every run: handler books == publisher books
+     (every order, every queue position, every instrument). All 7 demo
+     scenarios and all sweep runs: MATCH.
+  2. Consistency counters in the handler (all 0 in every run): unknown order
+     refs (an E/X/D/U for an order the book does not have: the signature of
+     a missed Add), over-reductions, add rejects, locate mismatches. Without
+     working recovery, these explode after the first gap.
+  3. Unit tests (tests/test_main.cpp):
+     - SPSC: wrap-around, full/empty, a 5M-message two-thread test checking
+       every value arrives in order.
+     - MoldUDP64 build/parse round trip, heartbeat/EOS, short packets.
+     - decode_into for every field of A/U/E; spec lengths.
+     - Snapshot round trip: build books from a random 20k-message stream, cut
+       in the middle, serialise, rebuild a replica that ALREADY HELD STALE
+       BOOKS (cleared first, as the handler does), compare digests; then feed
+       the rest of the stream to both and compare again.
+     - Digest priority test: same orders, different time priority -> the
+       digests must differ.
+     - Pending buffer: FIFO across chunks, entries stay put while appending,
+       cap enforced, space reused.
+  4. P3 itself is verified against a full trading day (see the P3 notes): this
+     project reuses that book and the same handler calls.
+
+
+-------------------------------------------------------------------------------
+10. HURDLES A STUDENT HITS ON THIS PROJECT, AND HOW TO SOLVE EACH ONE
+-------------------------------------------------------------------------------
+Hurdles 9-16 are real problems hit while building THIS project, in the order
+they appeared, with how each was diagnosed. The method matters as much as the
+fix.
+
+1. "My subscriber receives nothing" (multicast basics).
+   Checklist: the sender sets IP_MULTICAST_IF to the interface you join on;
+   IP_MULTICAST_LOOP = 1 if sender and receiver are on the same machine; the
+   receiver binds to the port (bind to the group address to filter out other
+   traffic on that port), then IP_ADD_MEMBERSHIP with group + interface
+   address. On WSL2, `lo` does not even have the MULTICAST flag, yet
+   IP_MULTICAST_IF=127.0.0.1 works. Test with a 10-line Python sender/receiver
+   before debugging your C++. TTL 0 keeps packets on the host.
+
+2. The socket buffer is tiny and you cannot make it bigger.
+   SO_RCVBUF is capped by net.core.rmem_max (212,992 here; the kernel then
+   doubles it to 425,984). The kernel charges each packet's full skb
+   "truesize" (~1 KB even for a 60-byte packet), so the buffer holds only a
+   few hundred packets: ~0.3 ms of traffic at 1M msg/s. Fixes:
+     sudo sysctl -w net.core.rmem_max=268435456   (then --rcvbuf 268435456)
+   or run as root so SO_RCVBUFFORCE works. Without root, design for it: read
+   fast, never block the feed thread, and keep recovery cheap. SO_RXQ_OVFL
+   tells you how many packets the KERNEL dropped, so you can tell its drops
+   apart from simulated ones.
+
+3. Sequence numbers count messages, not packets.
+   If you number packets, you cannot express "I have everything up to message
+   N" when N falls in the middle of a packet, and a recovery that ends
+   mid-packet breaks. Number messages; a packet carries its first number and
+   a count; process message by message with "skip if seq < expected".
+
+4. Losing the tail.
+   If the last packets of a burst are lost and the sender then goes quiet,
+   the receiver never sees a higher sequence number, so it never detects the
+   gap. Heartbeats carry the next sequence number. Likewise End of Session
+   must be repeated (hurdle 11).
+
+5. TCP is a byte stream, not messages.
+   A recv() can return half a message, or three and a half. Keep a buffer,
+   append what recv returns, parse every COMPLETE [len][msg], memmove the
+   remainder to the front. Never assume one recv = one response. (The same
+   applies on the server side to requests.)
+
+6. Non-blocking TCP details that bite.
+   - connect() returns EINPROGRESS; wait for EPOLLOUT, then check SO_ERROR:
+     EPOLLOUT alone does not mean success.
+   - send() on a socket the peer closed raises SIGPIPE and kills the process:
+     use MSG_NOSIGNAL (or ignore SIGPIPE).
+   - Handle EAGAIN (come back on the next EPOLLOUT/EPOLLIN) and EINTR.
+   - TCP_NODELAY on the request socket, or Nagle may hold a small request.
+   - Restarting quickly: SO_REUSEADDR on the listening socket.
+
+7. recvmmsg pitfalls.
+   msg_controllen is an in/out field: the kernel overwrites it, so reset it
+   before EVERY call or you silently stop receiving timestamps. msg_len (not
+   iov_len) is the datagram length. Use MSG_DONTWAIT. Batch size 32-64 is
+   plenty.
+
+8. Endianness and unaligned reads.
+   Everything on the wire is big-endian. Read with memcpy + __builtin_bswap
+   (never cast a byte pointer to uint64_t*: unaligned and a strict-aliasing
+   violation). P3's be16/be32/be64/be48 helpers do this.
+
+9. The hand-off race (the classic design bug).
+   Naive recovery: on a gap, stop reading UDP, fetch a snapshot, resume. Two
+   things go wrong. (a) The packets that arrived while you were fetching are
+   lost (they overflowed the socket) or applied before the snapshot. (b) The
+   snapshot may be older than the first live message you kept, leaving a
+   hole. Fix: keep reading and BUFFER, ask for state at least as new as the
+   first buffered message, then replay the buffer skipping covered sequence
+   numbers (section 7).
+
+10. A gap causing the next gap: rebuilding memory on reset (D12).
+    Symptom: the first deliberate drop produced the expected small gap, and
+    then a second, enormous one (85,000 messages) right after. The counters
+    showed queue-full and ring-full events and 103k kernel drops. Diagnosis:
+    the book thread was rebuilding the order book from scratch on Reset
+    (unmap + map + prefault ~600 MB), stalling ~300 ms. Fix: clear() in place.
+    Lesson: on the recovery path, anything slow becomes new loss.
+
+11. End of session lost during a recovery.
+    Symptom: at full speed the handler sat idle and never printed the digest
+    check. The three EOS copies had arrived while it was recovering, and
+    were then lost. Fix: the publisher repeats EOS every heartbeat interval
+    while it lingers, as real MoldUDP64 servers do.
+
+12. Recovery storm.
+    Symptom (flat-out replay, and late join at 10:00): recovery N took so
+    long that the buffer overflowed, causing gap N+1, which needed a bigger
+    snapshot (books grow during the day: 66 MB, ~0.5 s by mid-morning), and
+    so on. Fixes, in order: (a) buffer the live feed compactly (D7) instead
+    of in 2 KB ring slots; (b) retransmission for small gaps (D5), so most
+    recoveries cost ~0.4 ms instead of ~0.5 s; (c) keep draining the socket
+    while parsing a snapshot. Rule of thumb: a recovery must finish faster
+    than the time between losses, and the buffer must hold
+    (live rate x recovery time) of traffic.
+
+13. The 09:32 mystery: an order-id hash table that was too small (D13).
+    Symptom: at 1M msg/s with no loss, the queue still filled up for a few
+    hundred ms and p99.9 was 170 ms. Per-message book time looked fine on
+    average. How it was found, step by step:
+      - Per-thread CPU (ps -L): book thread at 100% on its own core, so it
+        was not starved; it was genuinely busy.
+      - A trace of the book thread's throughput in windows of 16k messages
+        first looked slow everywhere. But most of those windows were IDLE:
+        the book was waiting for data. Lesson: separate busy time from idle
+        time before concluding anything.
+      - With busy time measured separately: a few windows at seq ~9.9M
+        (09:32:02) took ~100 ms of real work (~6 us/message).
+      - Replaying the same messages OFFLINE (no network) reproduced it
+        exactly: data-dependent, not the network or the OS.
+      - Changing the price window size made no difference. Breaking the time
+        down by instrument: spread over many unrelated symbols, and all
+        message types slow. So the cause was a structure shared by all books:
+        the order-id table.
+      - The table uses an "identity" hash (slot = order id mod capacity).
+        ITCH order ids are sequential, so once ids pass the table size they
+        wrap onto slots still held by long-lived pre-market orders, and
+        linear probing walks long clusters. I had shrunk the pool to 4M orders
+        (an 8M-slot table) to save prefault memory. Back at 16M orders (a
+        32M-slot table, P3's default): zero slow windows, and the replay got
+        faster overall (153 -> 109 ns/message).
+    Lessons: shrinking a hash table "to save memory" can wreck its
+    performance; identity hashing is great for locality but sensitive to
+    wrap-around; and bisect a performance bug by removing layers (network ->
+    offline) and changing one variable at a time.
+
+14. First-touch page faults.
+    Symptom: kernel drops in the first ~60k messages of an otherwise clean
+    run. The 32 MB packet ring and 4 MB queue had never been touched, so the
+    first lap through them page-faulted on every new page, enough to stall
+    the feed thread past the ~0.3 ms the socket buffer could absorb. Fix:
+    touch (zero) them at construction. Same idea as --prefault for the book.
+    The few hundred to few thousand drops still seen at startup in some runs
+    come from the tiny socket buffer (hurdle 2) and are healed by
+    retransmission in under a millisecond.
+
+15. A queue-hop latency of 6.5 x 10^18 ns.
+    Stamps taken on two different cores can disagree by a few ns, so
+    sometimes T3 < T2. With unsigned arithmetic, b - a wraps to ~2^64.
+    Always clamp or check, and count how often it happens.
+
+16. An idle timeout that fired before the run started.
+    The handler exits after N idle seconds so a lost EOS cannot hang it. With
+    a large --prefault, the test script started the publisher after the
+    timeout had already expired, so the handler quit before the first packet.
+    Start idle timers only after the first packet.
+
+17. Measuring the wrong thing.
+    - Do not time with clock_gettime per stage on the hot path: ~20-50 ns
+      each, several per message. rdtsc is ~7 ns.
+    - Do not print or allocate in the loop being measured.
+    - Do not include recovery-replayed messages in live latency (D16).
+    - Report percentiles, not the mean: the mean hides the tail and the tail
+      is the point.
+    - Measure the queue on its own (queue_bench) so you know the floor.
+
+18. Deadline-based pacing creates catch-up bursts.
+    The publisher computes "message k is due at t0 + k/rate". If it stalls
+    (backpressure from the snapshot server, a page fault reading the file),
+    it then sends everything that is overdue as fast as it can. This is
+    realistic (exchanges burst too), but it means "1M msg/s" is an average,
+    not a ceiling. Check the per-second log line.
+
+19. WSL2 specifics.
+    The vCPUs are host threads, so the Windows host can preempt them. That
+    shows up as rare multi-ms stalls even on pinned, otherwise idle cores.
+    There is no isolcpus/nohz_full. Treat tails beyond p99.9 as environment
+    unless you can reproduce them offline. RAM is limited (7.7 GB here): the
+    publisher maps an 8 GB file, so the page cache cannot hold it. Run the
+    same window of data twice to have it cached, or expect read stalls.
+
+20. Thread pinning traps.
+    Put the threads on different physical cores (not hyper-thread
+    siblings), and keep the publisher's threads off the handler's cores.
+    Check with `ps -eLo tid,psr,pcpu,comm` that each thread really runs where
+    you think.
+
+21. Spinning threads and the test harness.
+    Busy-polling threads use 100% of a core even when idle, which is
+    expected. Make sure every loop also has an exit path (stop flag, idle
+    timeout, end of session), or a failed test hangs forever.
+
+
+-------------------------------------------------------------------------------
+11. INTERVIEW QUESTIONS WITH CRISP ANSWERS
+-------------------------------------------------------------------------------
+Q: Why UDP multicast and not TCP for market data?
+A: One send reaches every subscriber at the same time, the sender keeps no
+   per-client state, and a slow client cannot slow the feed (TCP flow control
+   would). Loss is handled by sequence numbers and a recovery service.
+
+Q: How do you detect a gap?
+A: Every message has a sequence number. I keep the next one I need. A packet
+   (or heartbeat, or end of session) starting above it means a gap. Below it
+   means a duplicate.
+
+Q: How do you recover without losing what arrives during recovery?
+A: I keep receiving and buffer everything from the first packet after the
+   gap. I ask for either the missing range (retransmission) or a snapshot
+   that is at least as new as the first buffered message. Then I replay the
+   buffer and skip sequence numbers the recovery already covered.
+
+Q: Why not always use snapshots?
+A: Their cost is proportional to the size of every book, not the gap: 66 MB
+   to repair 3 lost messages mid-morning. If losses come faster than
+   snapshots, you never catch up (I demonstrated that). Retransmission costs
+   O(gap). Snapshots remain for late joins and gaps older than the server's
+   history.
+
+Q: What makes your parsing zero-copy?
+A: recvmmsg writes into preallocated buffers; I read fields from there with
+   unaligned-safe big-endian loads and decode straight into the queue slot
+   the book thread reads. No copy of the packet or message is ever made on the
+   live path. The only copies are during recovery, deliberately.
+
+Q: How does your SPSC queue avoid locks, and why is it fast?
+A: One writer per index: the producer owns tail, the consumer owns head. The
+   producer writes the slot then release-stores tail; the consumer
+   acquire-loads tail and so sees the slot. The indices are on separate
+   cache lines, and each side caches the other's index, re-reading it only
+   when it looks full or empty. That avoids cache-line ping-pong. 64-byte
+   elements = one line each.
+
+Q: Why epoll and non-blocking sockets?
+A: One thread has to watch the UDP feed and a TCP recovery connection, and
+   must never block on either: a blocked feed thread means kernel buffer
+   overflow and more loss. Non-blocking + epoll lets it react to whichever is
+   ready. Busy polling (timeout 0) removes wake-up latency.
+
+Q: Where does the latency go?
+A: At 500k msg/s on this VM: ~1.5 us in the kernel (stage 1); ~130 ns parse;
+   ~140 ns queue hop; ~100 ns book. The kernel dominates, which is why
+   production systems use kernel bypass (Solarflare/ef_vi, DPDK, Onload) and
+   hardware timestamps.
+
+Q: How do you know your books are right after all that recovery?
+A: At the end I compare a digest of every order in every book, in queue
+   order, with the publisher's at the same sequence number: identical in
+   every scenario. During the run, an "unknown order reference" counter would
+   catch any missed Add. It stays at zero.
+
+Q: What was the hardest bug?
+A: Pick hurdle 13 (the hash table) or 10 (reset stall causing new loss), and
+   tell it as symptom -> hypothesis -> experiment -> fix -> lesson.
+
+Q: What would you change for production?
+A: Kernel bypass + hardware timestamps; A/B line arbitration (the same feed
+   on two networks, take whichever packet arrives first); a separate
+   retransmission server per feed; incremental snapshot streaming (send while
+   building); NUMA-aware placement; isolcpus/nohz_full; huge pages for
+   buffers; monitoring of gaps and recovery times.
+
+
+-------------------------------------------------------------------------------
+12. EXTENSIONS IF YOU WANT TO GO FURTHER
+-------------------------------------------------------------------------------
+  * A/B feed arbitration: publish to two groups, receive both, take the
+    first copy of each sequence number. Most "gaps" disappear without any
+    recovery.
+  * Use real network loss instead of simulated: `sudo tc qdisc add dev lo
+    root netem loss 0.1%` (needs the sch_netem module; on WSL it may be
+    missing).
+  * Hardware/software timestamping via SO_TIMESTAMPING; or a publisher-side
+    send timestamp to measure publisher -> wire.
+  * Stream snapshots: start sending while serialising, and apply on the
+    client as they arrive (already done on the client side).
+  * Kernel bypass (ef_vi / DPDK / AF_XDP) to collapse stage 1.
+  * Several book threads sharded by instrument (one SPSC queue each).
+  * Conflation: when the book thread is behind, skip intermediate states
+    of the same instrument for consumers that only need the top of book.
+
+
+-------------------------------------------------------------------------------
+13. GLOSSARY
+-------------------------------------------------------------------------------
+  multicast group   an IP address (224.0.0.0/4) that receivers join; packets
+                    sent to it reach every member
+  MoldUDP64         NASDAQ's framing for sequenced messages over UDP
+  sequence number   per-message counter used to detect loss
+  gap               a jump in sequence numbers: messages were lost
+  retransmission    resending a specific range of messages
+  snapshot          the full current state (every book), as of a sequence
+                    number
+  late join         starting to listen mid-session: an immediate gap from 1
+  heartbeat         empty packet with the next sequence number
+  recovery storm    recoveries that take so long they cause the next loss
+  epoll             Linux readiness notification for many file descriptors
+  busy polling      checking for work in a loop instead of sleeping
+  recvmmsg/sendmmsg receive/send many datagrams in one syscall
+  SO_TIMESTAMPNS    kernel receive timestamp per datagram
+  SO_RXQ_OVFL       per-socket count of datagrams the kernel dropped
+  SPSC              single-producer single-consumer
+  false sharing     two threads writing different data on the same cache line
+  TSC               CPU time-stamp counter, read with rdtsc
+  prefault          touching memory up front so the hot path never page-faults
+  percentile (p99)  99% of samples are at or below this value
+  coordinated
+  omission          measuring in a way that hides stalls (e.g. not timing
+                    messages that queued behind a slow one)

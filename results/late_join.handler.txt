@@ -1,0 +1,53 @@
+[handler] joined 239.1.1.1:30001 on 127.0.0.1 (rcvbuf 425984 bytes), TSC 2.803 GHz, busy-poll epoll; waiting for packets
+[feed] GAP: expected seq 1, got 60000001 (60000000 msgs missing) -> requesting snapshot
+[feed] RECOVERED by snapshot: 1738939 msgs (66.11 MB), resume at seq 60004825, 819.85 ms; replaying 366217 buffered packets
+[feed] GAP: expected seq 60192348, got 60192472 (124 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 124 msgs (0.00 MB), resume at seq 60192472, 0.45 ms; replaying 219838 buffered packets
+[feed] GAP: expected seq 60204949, got 60204953 (4 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 4 msgs (0.00 MB), resume at seq 60204953, 0.71 ms; replaying 209114 buffered packets
+[feed] GAP: expected seq 60418426, got 60418633 (207 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 207 msgs (0.01 MB), resume at seq 60418633, 0.42 ms; replaying 32600 buffered packets
+[feed] GAP: expected seq 60427112, got 60427350 (238 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 238 msgs (0.01 MB), resume at seq 60427350, 0.13 ms; replaying 25975 buffered packets
+[feed] GAP: expected seq 60478182, got 60478302 (120 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 120 msgs (0.00 MB), resume at seq 60478302, 0.39 ms; replaying 1169 buffered packets
+[feed] GAP: expected seq 60478429, got 60478455 (26 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 26 msgs (0.00 MB), resume at seq 60478455, 0.21 ms; replaying 1146 buffered packets
+[feed] GAP: expected seq 60478584, got 60478668 (84 msgs missing) -> requesting retransmission
+[feed] RECOVERED by retransmission: 84 msgs (0.00 MB), resume at seq 60478668, 0.19 ms; replaying 1137 buffered packets
+==================== feed handler report ====================
+packets 2663830  bytes 144229638  messages 2995176  pushed to book 2983205  (14.60 s)
+heartbeats 0  duplicate/old packets 3280  bad packets 0  bad messages 0
+loss: simulated drops 0  kernel socket drops 747  ring-full events 0  queue-full waits 446328
+gaps 8  (messages missed on the wire 60000803)  -> retransmissions 7 (803 msgs)  snapshots 1 (1738939 msgs, book resets 1)
+recovery buffer: peak 33.8 MB, packets lost to its cap 0
+  #1    snapshot   expected 1          saw 60000001   resume@60004825    1738939 msgs   66.11 MB  first byte  380.76 ms  done  819.85 ms  buffered pkts 366217  tries 1
+  #2    retransmit expected 60192348   saw 60192472   resume@60192472        124 msgs    0.00 MB  first byte    0.41 ms  done    0.45 ms  buffered pkts 219838  tries 1
+  #3    retransmit expected 60204949   saw 60204953   resume@60204953          4 msgs    0.00 MB  first byte    0.70 ms  done    0.71 ms  buffered pkts 209114  tries 1
+  #4    retransmit expected 60418426   saw 60418633   resume@60418633        207 msgs    0.01 MB  first byte    0.41 ms  done    0.42 ms  buffered pkts 32600   tries 1
+  #5    retransmit expected 60427112   saw 60427350   resume@60427350        238 msgs    0.01 MB  first byte    0.12 ms  done    0.13 ms  buffered pkts 25975   tries 1
+  #6    retransmit expected 60478182   saw 60478302   resume@60478302        120 msgs    0.00 MB  first byte    0.38 ms  done    0.39 ms  buffered pkts 1169    tries 1
+  #7    retransmit expected 60478429   saw 60478455   resume@60478455         26 msgs    0.00 MB  first byte    0.18 ms  done    0.21 ms  buffered pkts 1146    tries 1
+  #8    retransmit expected 60478584   saw 60478668   resume@60478668         84 msgs    0.00 MB  first byte    0.18 ms  done    0.19 ms  buffered pkts 1137    tries 1
+book: adds 3069467 execs 49548 execs w/price 952 cancels 38328 deletes 1300537 replaces 255196
+book consistency: unknown order refs 0  over-reductions 0  add rejects 0  locate mismatches 0   (all should be 0)
+
+latency per stage, ns (live messages only; snapshot and replayed-after-recovery excluded: 457093 replayed)
+  (39 cross-core TSC readings went backwards and were clamped to 0)
+  stage                             count      p50      p90      p99     p99.9        max      mean
+  1 wire -> user (kernel)         2526911     1584     1904    27904    479232    1348277      4023
+  2 user -> queued (parse)        2526911      134      308     4672   3440640    6839142      9742
+  3 queue hop (feed->book)        2526911      158     1968   125952   5439488   11346595     17221
+  4 book apply                    2526911      105      444      808      1200     851455       192
+    user -> book (2+3+4)          2526911      420     2592   157696   6619136   11346760     27156
+  = WIRE -> BOOK (1..4)           2526911     2032     5696   198656   7012352   11348438     31179
+  book apply by message type:
+      add (A/F)                   1133063       87      254      632       904      99442       124
+      execute (E)                   42300      206      552      936      1328      51158       276
+      execute w/ price (C)            822      158      452      696      1142       1142       218
+      cancel (X)                    32282       81      119      324       680     191322        97
+      delete (D)                  1100457      146      484      840      1232     261677       229
+      replace (U)                  217987      316      632      984      1520     851455       355
+
+final books: 8906 instruments, 1731624 resting orders, digest ce4ff04802569dbd
+server books: digest ce4ff04802569dbd at seq<63000001 (1731624 orders)  ->  MATCH: books identical to the publisher's

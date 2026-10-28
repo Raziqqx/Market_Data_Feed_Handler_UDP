@@ -1,0 +1,11 @@
+[publisher] /home/raziq/itch-data/12302019.NASDAQ_ITCH50 (8.25 GB) -> 239.1.1.1:30001 via 127.0.0.1, snapshot server on 127.0.0.1:31001
+[publisher] starting at seq 60000001
+[snapshot] served seq<60004825: 1738939 msgs, 66.1 MB, built in 257.8 ms
+[publisher] seq 60524289  500001 msg/s  packets 467492  dropped 0
+[publisher] seq 61048577  500000 msg/s  packets 927199  dropped 0
+[publisher] seq 61572865  500000 msg/s  packets 1396396  dropped 0
+[publisher] seq 62097153  500000 msg/s  packets 1863671  dropped 0
+[publisher] seq 62621441  500000 msg/s  packets 2326223  dropped 0
+[publisher] done: 3000000 msgs in 6.00 s (500000 msg/s), 2664568 packets, deliberately dropped 0 packets (0 msgs), last seq 63000000
+[snapshot] digest at seq<63000001: ce4ff04802569dbd (1731624 orders, 8906 books)
+[publisher] snapshot server: 1 snapshots, 7 retransmissions, 1 digests served

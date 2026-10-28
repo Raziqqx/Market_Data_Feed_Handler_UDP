@@ -1,0 +1,2 @@
+throughput: 50000000 x 64-byte updates in 0.562 s = 88.9 M/s (11.25 ns/update)  [check 1249999975000000]
+one-way hand-off (idle consumer spinning), ns: p50 138  p90 162  p99 186  p99.9 300  max 2668522
